@@ -20,13 +20,15 @@ function News(props) {
     const updateNews = async () => {
       // console.log("updateNews", props);
       const url = await GetRequest(
-        `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=7aba1bf81d4447ef84c0468dc16c3397&page=${page}&pageSize=${props.pageSize}`
+        `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=9144bd5aec61439fa30794031bd04725&page=${page}&pageSize=${props.pageSize}`
       );
-      console.log(url);
+      // console.log(url);
       setLoading(true);
+      console.log(articles);
       setArticles([...articles, ...url.articles]);
       setTotalResults(url.totalResults);
       setLoading(false);
+      props.setProgress(100);
     };
 
     updateNews();
@@ -35,12 +37,12 @@ function News(props) {
   const fetchMoreData = () => {
     console.log("fetchmore", page);
     const newPage = page + 1;
-    console.log(newPage);
+    // console.log(newPage);
     // let newPage = page + 1;
     setPage(newPage);
 
     /*     const url = GetRequest(
-      `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=7aba1bf81d4447ef84c0468dc16c3397&page=${newPage}&pageSize=${props.pageSize}`
+      `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=9144bd5aec61439fa30794031bd04725&page=${newPage}&pageSize=${props.pageSize}`
     );
     setLoading(true);
     console.log(
@@ -66,7 +68,7 @@ function News(props) {
   return (
     <>
       <h1 className="text-center" style={{ margin: "35px 0px" }}>
-        India Speaks - Top {capitalizeFirstLetter(props.category)} Headlines
+        Top {capitalizeFirstLetter(props.category)} Headlines
       </h1>
       {/* {loading && <Spinner />} */}
       <InfiniteScroll

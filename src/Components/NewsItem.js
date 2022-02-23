@@ -35,6 +35,7 @@ function NewsItem(props) {
             href={newsUrl}
             target="_blank"
             className="btn btn-sm btn-dark"
+            style={{ float: "right" }}
           >
             Read More
           </a>
