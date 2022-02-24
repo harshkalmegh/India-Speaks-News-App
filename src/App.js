@@ -31,19 +31,7 @@ function App() {
               />
             }
           />
-          <Route
-            exact
-            path="/about"
-            element={
-              <News
-                setProgress={setProgress}
-                key="general"
-                pageSize={6}
-                country="in"
-                category="general"
-              />
-            }
-          />
+
           <Route
             exact
             path="/business"
@@ -70,19 +58,7 @@ function App() {
               />
             }
           />
-          <Route
-            exact
-            path="/general"
-            element={
-              <News
-                setProgress={setProgress}
-                key="general"
-                pageSize={6}
-                country="in"
-                category="general"
-              />
-            }
-          />
+
           <Route
             exact
             path="/health"
