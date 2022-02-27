@@ -8,6 +8,9 @@ import { useState } from "react";
 
 function App() {
   const [progress, setProgress] = useState(0);
+  let apiKey = "9144bd5aec61439fa30794031bd04725";
+  let api = process.env.REACT_APP_NEWS_API;
+  console.log(api);
   return (
     <div>
       <BrowserRouter>
@@ -28,6 +31,7 @@ function App() {
                 pageSize={6}
                 country="in"
                 category="general"
+                apiKey={apiKey}
               />
             }
           />
@@ -42,6 +46,7 @@ function App() {
                 pageSize={6}
                 country="in"
                 category="business"
+                apiKey={apiKey}
               />
             }
           />
@@ -55,6 +60,7 @@ function App() {
                 pageSize={6}
                 country="in"
                 category="entertainment"
+                apiKey={apiKey}
               />
             }
           />
@@ -69,6 +75,7 @@ function App() {
                 pageSize={6}
                 country="in"
                 category="health"
+                apiKey={apiKey}
               />
             }
           />
@@ -82,6 +89,7 @@ function App() {
                 pageSize={6}
                 country="in"
                 category="science"
+                apiKey={apiKey}
               />
             }
           />
@@ -95,6 +103,7 @@ function App() {
                 pageSize={6}
                 country="in"
                 category="sports"
+                apiKey={apiKey}
               />
             }
           />
@@ -108,6 +117,7 @@ function App() {
                 pageSize={6}
                 country="in"
                 category="technology"
+                apiKey={apiKey}
               />
             }
           />

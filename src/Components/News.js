@@ -8,7 +8,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 function News(props) {
   // console.log("News", props);
   const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
 
@@ -20,7 +20,7 @@ function News(props) {
     const updateNews = async () => {
       // console.log("updateNews", props);
       const url = await GetRequest(
-        `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=9144bd5aec61439fa30794031bd04725&page=${page}&pageSize=${props.pageSize}`
+        `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`
       );
       // console.log(url);
       setLoading(true);
@@ -67,7 +67,7 @@ function News(props) {
 
   return (
     <>
-      <h1 className="text-center" style={{ margin: "35px 0px" }}>
+      <h1 className="text-center" style={{ margin: "90px 0 35px 0" }}>
         Top {capitalizeFirstLetter(props.category)} Headlines
       </h1>
       {/* {loading && <Spinner />} */}
