@@ -27,7 +27,16 @@ function NavBar() {
                   Home
                 </a>
               </li>
-
+              <li className="nav-item">
+                <Link className="nav-link" to="/politics">
+                  Politics
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/world">
+                  World
+                </Link>
+              </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/business">
                   Business
@@ -57,6 +66,16 @@ function NavBar() {
               <li className="nav-item">
                 <Link className="nav-link" to="/technology">
                   Technology
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/food">
+                  Food
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/environment">
+                  Environment
                 </Link>
               </li>
             </ul>

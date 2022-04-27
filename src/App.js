@@ -9,8 +9,6 @@ import { useState } from "react";
 function App() {
   const [progress, setProgress] = useState(0);
   let apiKey = "9144bd5aec61439fa30794031bd04725";
-  let api = process.env.REACT_APP_NEWS_API;
-  console.log(api);
   return (
     <div>
       <BrowserRouter>
@@ -27,10 +25,38 @@ function App() {
             element={
               <News
                 setProgress={setProgress}
-                key="general"
+                key=""
                 pageSize={6}
                 country="in"
-                category="general"
+                category="top"
+                apiKey={apiKey}
+              />
+            }
+          />
+          <Route
+            exact
+            path="/politics"
+            element={
+              <News
+                setProgress={setProgress}
+                key="politics"
+                pageSize={6}
+                country="in"
+                category="politics"
+                apiKey={apiKey}
+              />
+            }
+          />
+          <Route
+            exact
+            path="/world"
+            element={
+              <News
+                setProgress={setProgress}
+                key="world"
+                pageSize={6}
+                country="in"
+                category="world"
                 apiKey={apiKey}
               />
             }
@@ -117,6 +143,34 @@ function App() {
                 pageSize={6}
                 country="in"
                 category="technology"
+                apiKey={apiKey}
+              />
+            }
+          />
+          <Route
+            exact
+            path="/food"
+            element={
+              <News
+                setProgress={setProgress}
+                key="food"
+                pageSize={6}
+                country="in"
+                category="food"
+                apiKey={apiKey}
+              />
+            }
+          />
+          <Route
+            exact
+            path="/environment"
+            element={
+              <News
+                setProgress={setProgress}
+                key="environment"
+                pageSize={6}
+                country="in"
+                category="environment"
                 apiKey={apiKey}
               />
             }

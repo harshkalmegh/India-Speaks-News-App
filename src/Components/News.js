@@ -9,7 +9,7 @@ function News(props) {
   // console.log("News", props);
   const [articles, setArticles] = useState([]);
   const [, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
 
   const capitalizeFirstLetter = (string) => {
@@ -18,14 +18,20 @@ function News(props) {
 
   useEffect(() => {
     const updateNews = async () => {
+      let url;
       // console.log("updateNews", props);
-      const url = await GetRequest(
-        `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`
-      );
-      // console.log(url);
+      if (url !== undefined) {
+        url = await GetRequest(
+          `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&category=${props.category}`
+        );
+      } else {
+        url = await GetRequest(
+          `https://newsdata.io/api/1/news?apikey=pub_68813d1cb70fe729b6aaab9e585c41d6d5d4&country=in&language=en,hi&page=${page}&category=${props.category}`
+        );
+      }
       setLoading(true);
-      console.log(articles);
-      setArticles([...articles, ...url.articles]);
+      console.log(url);
+      setArticles([...articles, ...url.results]);
       setTotalResults(url.totalResults);
       setLoading(false);
       props.setProgress(100);
@@ -35,7 +41,7 @@ function News(props) {
   }, [page, props.category, props.pageSize]);
 
   const fetchMoreData = () => {
-    console.log("fetchmore", page);
+    // console.log("fetchmore", page);
     const newPage = page + 1;
     // console.log(newPage);
     // let newPage = page + 1;
@@ -84,16 +90,16 @@ function News(props) {
                 return (
                   <div className="col-md-4" key={element.url}>
                     <NewsItem
-                      key={element.url}
+                      key={element.link}
                       title={element.title ? element.title : ""}
                       description={
                         element.description ? element.description : ""
                       }
-                      imageUrl={element.urlToImage}
-                      newsUrl={element.url}
-                      author={element.author}
-                      date={element.publishedAt}
-                      source={element.source.name}
+                      imageUrl={element.image_url}
+                      newsUrl={element.link}
+                      author={element.creator}
+                      date={`${element.pubDate}z`}
+                      source={element.source_id}
                     />
                   </div>
                 );
