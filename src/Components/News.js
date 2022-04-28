@@ -22,11 +22,11 @@ function News(props) {
       // console.log("updateNews", props);
       if (url !== undefined) {
         url = await GetRequest(
-          `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&category=${props.category}`
+          `https://newsdata.io/api/1/news?apikey=pub_68813d1cb70fe729b6aaab9e585c41d6d5d4&country=in&language=en,hi&page=${page}&category=${props.category}`
         );
       } else {
         url = await GetRequest(
-          `https://newsdata.io/api/1/news?apikey=pub_68813d1cb70fe729b6aaab9e585c41d6d5d4&country=in&language=en,hi&page=${page}&category=${props.category}`
+          `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&category=${props.category}`
         );
       }
       setLoading(true);
@@ -38,7 +38,8 @@ function News(props) {
     };
 
     updateNews();
-  }, [articles, page, props, props.category, props.pageSize]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, props.category, props.pageSize]);
 
   const fetchMoreData = () => {
     // console.log("fetchmore", page);
