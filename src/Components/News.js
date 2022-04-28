@@ -38,7 +38,7 @@ function News(props) {
     };
 
     updateNews();
-  }, [page, props.category, props.pageSize]);
+  }, [articles, page, props, props.category, props.pageSize]);
 
   const fetchMoreData = () => {
     // console.log("fetchmore", page);
