@@ -6,7 +6,7 @@ import "./NewsItem.css";
 
 function NewsItem(props) {
   let { title, description, imageUrl, newsUrl, author, date, source } = props;
-  console.log("imageUrl from newsitem", title, imageUrl);
+  // console.log("imageUrl from newsitem", title, imageUrl);
   return (
     <div className="my-3">
       <div className="card">
@@ -23,7 +23,11 @@ function NewsItem(props) {
         {imageUrl !== null ? (
           <img src={imageUrl} className="card-img-top" alt="..." />
         ) : (
-          <LinkPreview url={newsUrl} width="335px" />
+          <LinkPreview
+            url={newsUrl}
+            width="335px"
+            showPlaceholderIfNoImage={true}
+          />
         )}
 
         <div className="card-body">

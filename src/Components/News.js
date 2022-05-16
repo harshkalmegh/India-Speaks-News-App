@@ -78,7 +78,7 @@ function News(props) {
         }
       }
       setLoading(true);
-      console.log(url);
+      // console.log(url);
       setArticles([...articles, ...url.results]);
       setTotalResults(url.totalResults);
       setLoading(false);
@@ -86,7 +86,7 @@ function News(props) {
     };
 
     updateNews();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, props.category, props.pageSize]);
 
   const fetchMoreData = () => {
@@ -135,9 +135,9 @@ function News(props) {
         <div className="container">
           <div className="container">
             <div className="row">
-              {articles.map((element) => {
+              {articles.map((element, key) => {
                 return (
-                  <div className="col-md-4" key={element.url}>
+                  <div className="col-md-4" key={key}>
                     <NewsItem
                       key={element.link}
                       title={element.title ? element.title : ""}
