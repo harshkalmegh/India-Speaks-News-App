@@ -1,8 +1,12 @@
+// @ts-check
+
 import React from "react";
+import { LinkPreview } from "@dhaiwat10/react-link-preview";
+import "./NewsItem.css";
 
 function NewsItem(props) {
   let { title, description, imageUrl, newsUrl, author, date, source } = props;
-  // console.log("props from newsitem", props);
+  console.log("imageUrl from newsitem", title, imageUrl);
   return (
     <div className="my-3">
       <div className="card">
@@ -16,15 +20,12 @@ function NewsItem(props) {
         >
           <span className="badge rounded-pill bg-danger">{source}</span>
         </div>
-        <img
-          src={
-            !imageUrl
-              ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw7HjpHNuzVssA9WGGtdCI0kC6gnLmjbMVuw&usqp=CAU"
-              : imageUrl
-          }
-          className="card-img-top"
-          alt="..."
-        />
+        {imageUrl !== null ? (
+          <img src={imageUrl} className="card-img-top" alt="..." />
+        ) : (
+          <LinkPreview url={newsUrl} width="335px" />
+        )}
+
         <div className="card-body">
           <h5 className="card-title">{title}</h5>
 
