@@ -25,7 +25,7 @@ function NewsItem(props) {
         ) : (
           <LinkPreview
             url={newsUrl}
-            width="347px"
+            width="100%"
             showPlaceholderIfNoImage={true}
           />
         )}
