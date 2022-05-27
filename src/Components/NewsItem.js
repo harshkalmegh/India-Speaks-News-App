@@ -1,7 +1,6 @@
 // @ts-check
 
 import React from "react";
-import "./NewsItem.css";
 import { LinkPreview } from "@dhaiwat10/react-link-preview";
 
 function NewsItem(props) {
