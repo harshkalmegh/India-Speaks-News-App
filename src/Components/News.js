@@ -11,6 +11,7 @@ function News(props) {
   const [, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
+  const [input, setInput] = useState("");
 
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -29,6 +30,68 @@ function News(props) {
       //     `https://newsdata.io/api/1/news?apikey=pub_68813d1cb70fe729b6aaab9e585c41d6d5d4&country=in&language=en,hi&page=${page}&category=${props.category}`
       //   );
       // }
+      if (props.category === "search") {
+        if (input === "") {
+          setLoading(false);
+          setArticles([]);
+        } else {
+          // url = await GetRequest(
+          //   `https://newsdata.io/api/1/news?apikey=pub_69237c4e16b502b115847eae41bd56dd0262&country=in&language=en,hi&page=${page}&q=${input}`
+          // );
+          url = await GetRequest(
+            `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&q=${input}`
+          );
+          if (url === undefined) {
+            url = await GetRequest(
+              `https://newsdata.io/api/1/news?apikey=pub_68813d1cb70fe729b6aaab9e585c41d6d5d4&country=in&language=en,hi&page=${page}&q=${input}`
+            );
+            if (url === undefined) {
+              url = await GetRequest(
+                `https://newsdata.io/api/1/news?apikey=pub_6916b9b2ca77f2af651658ac6664207d137b&country=in&language=en,hi&page=${page}&q=${input}`
+              );
+              if (url === undefined) {
+                url = await GetRequest(
+                  `https://newsdata.io/api/1/news?apikey=pub_691773564c6cc88fc0fb0fa52e1f3389a101&country=in&language=en,hi&page=${page}&q=${input}`
+                );
+                if (url === undefined) {
+                  url = await GetRequest(
+                    `https://newsdata.io/api/1/news?apikey=pub_69185e9b582562890079695628ea412ef69c&country=in&language=en,hi&page=${page}&q=${input}`
+                  );
+                  if (url === undefined) {
+                    url = await GetRequest(
+                      `https://newsdata.io/api/1/news?apikey=pub_69196c0a7d5b2498f5716de4a37b63790a42&country=in&language=en,hi&page=${page}&q=${input}`
+                    );
+                    if (url === undefined) {
+                      url = await GetRequest(
+                        `https://newsdata.io/api/1/news?apikey=pub_69206fe998104e6cd9c141719027e06873f7&country=in&language=en,hi&page=${page}&q=${input}`
+                      );
+                      if (url === undefined) {
+                        url = await GetRequest(
+                          `https://newsdata.io/api/1/news?apikey=pub_69211c566814e0d10a2f82f853254531e9e3&country=in&language=en,hi&page=${page}&q=${input}`
+                        );
+                        if (url === undefined) {
+                          url = await GetRequest(
+                            `https://newsdata.io/api/1/news?apikey=pub_69226de13f52bf066cf6b2851810bfd207b0&country=in&language=en,hi&page=${page}&q=${input}`
+                          );
+                          if (url === undefined) {
+                            url = await GetRequest(
+                              `https://newsdata.io/api/1/news?apikey=pub_69237c4e16b502b115847eae41bd56dd0262&country=in&language=en,hi&page=${page}&q=${input}`
+                            );
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          setLoading(true);
+          setArticles([...articles, ...url.results]);
+          setTotalResults(url.totalResults);
+          setLoading(false);
+        }
+      } else {
       url = await GetRequest(
         `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&category=${props.category}`
       );
@@ -83,11 +146,12 @@ function News(props) {
       setTotalResults(url.totalResults);
       setLoading(false);
       props.setProgress(100);
+      }
     };
 
     updateNews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, props.category, props.pageSize]);
+  }, [page, props.category, props.pageSize, input]);
 
   const fetchMoreData = () => {
     // console.log("fetchmore", page);
@@ -123,14 +187,31 @@ function News(props) {
   return (
     <>
       <h1 className="text-center" style={{ margin: "90px 0 35px 0" }}>
-        Top {capitalizeFirstLetter(props.category)} Headlines
+        {capitalizeFirstLetter(props.category)} Headlines
       </h1>
       {/* {loading && <Spinner />} */}
+      <div>
+        {props.category === "search" ? (
+          <input
+            type="text"
+            className="SearchNews"
+            placeholder="Search Here"
+            // value={input}
+            onChange={(e) => {
+              setTimeout(() => {
+                setInput(e.target.value);
+              }, 2500);
+            }}
+          />
+        ) : (
+          ""
+        )}
+      </div>
       <InfiniteScroll
         dataLength={articles.length}
         next={fetchMoreData}
         hasMore={articles.length !== totalResults}
-        loader={<Spinner />}
+        loader={input === "" ? "" : <Spinner />}
       >
         <div className="container">
           <div className="container">
