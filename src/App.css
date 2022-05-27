@@ -78,3 +78,23 @@
   margin: auto;
   display: flex;
 }
+
+.SearchNewsButton {
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 5px 15px;
+  width: fit-content;
+  margin: auto;
+  display: flex;
+}
+
+.SearchNewsButton:hover {
+  background-color: #282c34;
+  color: white;
+  transition-duration: 300ms;
+}
+
+.SearchNewsButton:active {
+  transform: scale(0.98);
+  box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
