@@ -12,10 +12,18 @@ function News(props) {
   const [page, setPage] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
   const [input, setInput] = useState("");
+  const [search, setSearch] = useState(false);
 
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
+  
+  useEffect(() => {
+    if (input === "") {
+      setArticles([]);
+      setSearch(false);
+    }
+  }, [input]);
 
   useEffect(() => {
     const updateNews = async () => {
@@ -151,7 +159,7 @@ function News(props) {
 
     updateNews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, props.category, props.pageSize, input]);
+  }, [page, props.category, props.pageSize, search]);
 
   const fetchMoreData = () => {
     // console.log("fetchmore", page);
@@ -198,11 +206,22 @@ function News(props) {
             placeholder="Search Here"
             // value={input}
             onChange={(e) => {
-              setTimeout(() => {
                 setInput(e.target.value);
-              }, 2500);
             }}
           />
+        ) : (
+          ""
+        )}
+        <br />
+        {props.category === "search" ? (
+          <button
+            className="SearchNewsButton"
+            onClick={() => {
+              setSearch(true);
+            }}
+          >
+            Search
+          </button>
         ) : (
           ""
         )}
