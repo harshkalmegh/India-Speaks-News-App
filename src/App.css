@@ -62,3 +62,19 @@
   text-overflow: ellipsis;
   font-size: 11px;
 }
+
+.LowerContainer {
+  display: none;
+}
+
+.SearchNews {
+  overflow: visible;
+  animation-duration: 10ms;
+  outline: none;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 4px;
+  width: 300px;
+  margin: auto;
+  display: flex;
+}
