@@ -2,6 +2,7 @@
 
 import React from "react";
 import "./NewsItem.css";
+import { LinkPreview } from "@dhaiwat10/react-link-preview";
 
 function NewsItem(props) {
   let { title, description, imageUrl, newsUrl, author, date, source } = props;
@@ -22,10 +23,10 @@ function NewsItem(props) {
         {imageUrl !== null ? (
           <img src={imageUrl} className="card-img-top" alt="..." />
         ) : (
-          <img
-            src="https://media.istockphoto.com/photos/abstract-digital-news-concept-picture-id1192070239?k=20&m=1192070239&s=612x612&w=0&h=fWrzqshKbKOGLEA_UrYcbrYuhs9sWrKQ4dF8b_f_VG4="
-            className="card-img-top"
-            alt="..."
+          <LinkPreview
+            url={newsUrl}
+            width="100%"
+            showPlaceholderIfNoImage={true}
           />
         )}
 
