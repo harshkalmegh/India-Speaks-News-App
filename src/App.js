@@ -175,6 +175,20 @@ function App() {
               />
             }
           />
+<Route
+            exact
+            path="/search"
+            element={
+              <News
+                setProgress={setProgress}
+                key="search"
+                pageSize={6}
+                country="in"
+                category="search"
+                apiKey={apiKey}
+              />
+            }
+          />
         </Routes>
       </BrowserRouter>
     </div>
