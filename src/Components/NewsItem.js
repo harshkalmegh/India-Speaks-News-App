@@ -30,7 +30,7 @@ function NewsItem(props) {
         )}
 
         <div className="card-body">
-          <h5 className="card-title">{title}</h5>
+          <h1 className="card-title">{title}</h1>
 
           <p className="card-text">{description}...</p>
           <p className="card-text">
