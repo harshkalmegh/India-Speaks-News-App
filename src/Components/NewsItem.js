@@ -19,7 +19,7 @@ function NewsItem(props) {
         >
           <span className="badge rounded-pill bg-danger">{source}</span>
         </div>
-        {imageUrl !== null ? (
+        {imageUrl ? (
           <img src={imageUrl} className="card-img-top" alt="..." />
         ) : (
           <LinkPreview

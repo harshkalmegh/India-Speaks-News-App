@@ -1,1 +1,1 @@
-# India-Speaks-News-App
+# IndiaSpeaks
