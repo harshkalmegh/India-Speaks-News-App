@@ -28,24 +28,13 @@ function News(props) {
   useEffect(() => {
     const updateNews = async () => {
       let url;
-      // console.log("updateNews", props);
-      // if (url !== undefined) {
-      //   url = await GetRequest(
-      //     `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&category=${props.category}`
-      //   );
-      // } else if (url !== undefined) {
-      //   url = await GetRequest(
-      //     `https://newsdata.io/api/1/news?apikey=pub_68813d1cb70fe729b6aaab9e585c41d6d5d4&country=in&language=en,hi&page=${page}&category=${props.category}`
-      //   );
-      // }
+      
       if (props.category === "search") {
         if (input === "") {
           setLoading(false);
           setArticles([]);
         } else {
-          // url = await GetRequest(
-          //   `https://newsdata.io/api/1/news?apikey=pub_69237c4e16b502b115847eae41bd56dd0262&country=in&language=en,hi&page=${page}&q=${input}`
-          // );
+          
           url = await GetRequest(
             `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&q=${input}`
           );
@@ -162,35 +151,15 @@ function News(props) {
   }, [page, props.category, props.pageSize, search]);
 
   const fetchMoreData = () => {
-    // console.log("fetchmore", page);
     const newPage = page + 1;
-    // console.log(newPage);
-    // let newPage = page + 1;
     setPage(newPage);
-
-    /*     const url = GetRequest(
-      `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=9144bd5aec61439fa30794031bd04725&page=${newPage}&pageSize=${props.pageSize}`
-    );
-    setLoading(true);
-    console.log(
-      url.then((data) => {
-        console.log(data.articles);
-      })
-    );
-    // setArticles(articles.concat(url.articles));
-    setTotalResults(url.totalResults);
-    setLoading(false); */
   };
-
-  // const handlePreviousClick = async () => {
-  //   setPage(page - 1);
-  //   updateNews();
-  // };
-
-  // const handleNextClick = async () => {
-  //   setPage(page + 1);
-  //   updateNews();
-  // };
+  
+  function _handleKeyDown(e) {
+    if (e.key === "Enter") {
+      document.getElementById("myBtnSearch").click();
+    }
+  }
 
   return (
     <>
@@ -208,6 +177,7 @@ function News(props) {
             onChange={(e) => {
                 setInput(e.target.value);
             }}
+            onKeyDown={_handleKeyDown}
           />
         ) : (
           ""
@@ -216,6 +186,7 @@ function News(props) {
         {props.category === "search" ? (
           <button
             className="SearchNewsButton"
+         id="myBtnSearch"
             onClick={() => {
               setSearch(true);
             }}
