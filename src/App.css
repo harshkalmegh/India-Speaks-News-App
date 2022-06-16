@@ -40,9 +40,9 @@
 .card-img-top {
   display: flex;
   flex-direction: row;
-  /* height: 385px; */
   align-content: center;
   height: 210px;
+  object-fit: contain;
 }
 
 
