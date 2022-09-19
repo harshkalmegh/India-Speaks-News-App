@@ -168,30 +168,36 @@ function News(props) {
       {/* {loading && <Spinner />} */}
       <div>
         {props.category === "search" ? (
-          <input
-            type="text"
-            className="SearchNews"
-            placeholder="Search Here"
-            // value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-            }}
-            onKeyDown={_handleKeyDown}
-          />
-        ) : (
-          ""
-        )}
-        <br />
-        {props.category === "search" ? (
-          <button
-            className="SearchNewsButton"
-            id="myBtnSearch"
-            onClick={() => {
-              setSearch(true);
-            }}
-          >
-            Search
-          </button>
+          <>
+            <input
+              type="text"
+              className="SearchNews"
+              placeholder="Search Here"
+              onChange={(e) => {
+                setInput(e.target.value);
+              }}
+              onKeyDown={_handleKeyDown}
+            />
+            <button
+              className="SearchNewsButton"
+              id="myBtnSearch"
+              onClick={() => {
+                setSearch(true);
+              }}
+            >
+              Search
+            </button>
+            <button
+              className="SearchNewsButton"
+              id="myBtnSearch"
+              onClick={() => {
+                setArticles([]);
+                setLoading(false);
+              }}
+            >
+              Reset
+            </button>
+          </>
         ) : (
           ""
         )}
@@ -200,7 +206,7 @@ function News(props) {
         dataLength={articles.length}
         next={fetchMoreData}
         hasMore={articles.length !== totalResults}
-        loader={input === "" ? "" : <Spinner />}
+        loader={input.length === 0 ? "" : <Spinner />}
       >
         <div className="container">
           <div className="container">
