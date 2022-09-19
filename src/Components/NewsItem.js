@@ -20,7 +20,7 @@ function NewsItem(props) {
         {imageUrl ? (
           <img src={imageUrl} className="card-img-top" alt="..." />
         ) : (
-          "no-image"
+          ""
         )}
 
         <div className="card-body">
