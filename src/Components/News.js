@@ -17,7 +17,7 @@ function News(props) {
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
-  
+
   useEffect(() => {
     if (input === "") {
       setArticles([]);
@@ -28,13 +28,12 @@ function News(props) {
   useEffect(() => {
     const updateNews = async () => {
       let url;
-      
+
       if (props.category === "search") {
         if (input === "") {
           setLoading(false);
           setArticles([]);
         } else {
-          
           url = await GetRequest(
             `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&q=${input}`
           );
@@ -89,45 +88,46 @@ function News(props) {
           setLoading(false);
         }
       } else {
-      url = await GetRequest(
-        `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&category=${props.category}`
-      );
-      if (url === undefined) {
         url = await GetRequest(
-          `https://newsdata.io/api/1/news?apikey=pub_68813d1cb70fe729b6aaab9e585c41d6d5d4&country=in&language=en,hi&page=${page}&category=${props.category}`
+          `https://newsdata.io/api/1/news?apikey=pub_6879d4cafb3ed0fad900a2dd828177512d21&country=in&language=en,hi&page=${page}&category=${props.category}`
         );
         if (url === undefined) {
           url = await GetRequest(
-            `https://newsdata.io/api/1/news?apikey=pub_6916b9b2ca77f2af651658ac6664207d137b&country=in&language=en,hi&page=${page}&category=${props.category}`
+            `https://newsdata.io/api/1/news?apikey=pub_68813d1cb70fe729b6aaab9e585c41d6d5d4&country=in&language=en,hi&page=${page}&category=${props.category}`
           );
           if (url === undefined) {
             url = await GetRequest(
-              `https://newsdata.io/api/1/news?apikey=pub_691773564c6cc88fc0fb0fa52e1f3389a101&country=in&language=en,hi&page=${page}&category=${props.category}`
+              `https://newsdata.io/api/1/news?apikey=pub_6916b9b2ca77f2af651658ac6664207d137b&country=in&language=en,hi&page=${page}&category=${props.category}`
             );
             if (url === undefined) {
               url = await GetRequest(
-                `https://newsdata.io/api/1/news?apikey=pub_69185e9b582562890079695628ea412ef69c&country=in&language=en,hi&page=${page}&category=${props.category}`
+                `https://newsdata.io/api/1/news?apikey=pub_691773564c6cc88fc0fb0fa52e1f3389a101&country=in&language=en,hi&page=${page}&category=${props.category}`
               );
               if (url === undefined) {
                 url = await GetRequest(
-                  `https://newsdata.io/api/1/news?apikey=pub_69196c0a7d5b2498f5716de4a37b63790a42&country=in&language=en,hi&page=${page}&category=${props.category}`
+                  `https://newsdata.io/api/1/news?apikey=pub_69185e9b582562890079695628ea412ef69c&country=in&language=en,hi&page=${page}&category=${props.category}`
                 );
                 if (url === undefined) {
                   url = await GetRequest(
-                    `https://newsdata.io/api/1/news?apikey=pub_69206fe998104e6cd9c141719027e06873f7&country=in&language=en,hi&page=${page}&category=${props.category}`
+                    `https://newsdata.io/api/1/news?apikey=pub_69196c0a7d5b2498f5716de4a37b63790a42&country=in&language=en,hi&page=${page}&category=${props.category}`
                   );
                   if (url === undefined) {
                     url = await GetRequest(
-                      `https://newsdata.io/api/1/news?apikey=pub_69211c566814e0d10a2f82f853254531e9e3&country=in&language=en,hi&page=${page}&category=${props.category}`
+                      `https://newsdata.io/api/1/news?apikey=pub_69206fe998104e6cd9c141719027e06873f7&country=in&language=en,hi&page=${page}&category=${props.category}`
                     );
                     if (url === undefined) {
                       url = await GetRequest(
-                        `https://newsdata.io/api/1/news?apikey=pub_69226de13f52bf066cf6b2851810bfd207b0&country=in&language=en,hi&page=${page}&category=${props.category}`
+                        `https://newsdata.io/api/1/news?apikey=pub_69211c566814e0d10a2f82f853254531e9e3&country=in&language=en,hi&page=${page}&category=${props.category}`
                       );
                       if (url === undefined) {
                         url = await GetRequest(
-                          `https://newsdata.io/api/1/news?apikey=pub_69237c4e16b502b115847eae41bd56dd0262&country=in&language=en,hi&page=${page}&category=${props.category}`
+                          `https://newsdata.io/api/1/news?apikey=pub_69226de13f52bf066cf6b2851810bfd207b0&country=in&language=en,hi&page=${page}&category=${props.category}`
                         );
+                        if (url === undefined) {
+                          url = await GetRequest(
+                            `https://newsdata.io/api/1/news?apikey=pub_69237c4e16b502b115847eae41bd56dd0262&country=in&language=en,hi&page=${page}&category=${props.category}`
+                          );
+                        }
                       }
                     }
                   }
@@ -136,13 +136,12 @@ function News(props) {
             }
           }
         }
-      }
-      setLoading(true);
-      // console.log(url);
-      setArticles([...articles, ...url.results]);
-      setTotalResults(url.totalResults);
-      setLoading(false);
-      props.setProgress(100);
+        setLoading(true);
+        // console.log(url);
+        setArticles([...articles, ...url.results]);
+        setTotalResults(url.totalResults);
+        setLoading(false);
+        props.setProgress(100);
       }
     };
 
@@ -154,7 +153,7 @@ function News(props) {
     const newPage = page + 1;
     setPage(newPage);
   };
-  
+
   function _handleKeyDown(e) {
     if (e.key === "Enter") {
       document.getElementById("myBtnSearch").click();
@@ -175,7 +174,7 @@ function News(props) {
             placeholder="Search Here"
             // value={input}
             onChange={(e) => {
-                setInput(e.target.value);
+              setInput(e.target.value);
             }}
             onKeyDown={_handleKeyDown}
           />
@@ -186,7 +185,7 @@ function News(props) {
         {props.category === "search" ? (
           <button
             className="SearchNewsButton"
-         id="myBtnSearch"
+            id="myBtnSearch"
             onClick={() => {
               setSearch(true);
             }}

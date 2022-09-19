@@ -1,11 +1,9 @@
 // @ts-check
 
 import React from "react";
-import { LinkPreview } from "@dhaiwat10/react-link-preview";
 
 function NewsItem(props) {
   let { title, description, imageUrl, newsUrl, author, date, source } = props;
-  // console.log("imageUrl from newsitem", title, imageUrl);
   return (
     <div className="my-3">
       <div className="card">
@@ -22,11 +20,7 @@ function NewsItem(props) {
         {imageUrl ? (
           <img src={imageUrl} className="card-img-top" alt="..." />
         ) : (
-          <LinkPreview
-            url={newsUrl}
-            width="100%"
-            showPlaceholderIfNoImage={true}
-          />
+          "no-image"
         )}
 
         <div className="card-body">
