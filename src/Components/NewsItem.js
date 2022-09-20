@@ -1,9 +1,12 @@
 // @ts-check
 
 import React from "react";
+import { useLinkPreview } from "get-link-preview";
 
 function NewsItem(props) {
   let { title, description, imageUrl, newsUrl, author, date, source } = props;
+  
+   const { data } = useLinkPreview(newsUrl);
   return (
     <div className="my-3">
       <div className="card">
@@ -20,7 +23,8 @@ function NewsItem(props) {
         {imageUrl ? (
           <img src={imageUrl} className="card-img-top" alt="..." />
         ) : (
-          ""
+          // @ts-ignore
+          <img src={!data ? "" : data.image} className="card-img-top" alt="..." />
         )}
 
         <div className="card-body">
