@@ -193,6 +193,7 @@ function News(props) {
               onClick={() => {
                 setArticles([]);
                 setLoading(false);
+                setInput("");
               }}
             >
               Reset
