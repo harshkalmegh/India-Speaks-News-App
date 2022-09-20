@@ -24,7 +24,12 @@ function NewsItem(props) {
           <img src={imageUrl} className="card-img-top" alt="..." />
         ) : (
           // @ts-ignore
-          <img src={!data ? "" : data.image} className="card-img-top" alt="..." />
+          <img
+            // @ts-ignore
+            src={!data ? "" : data.image}
+            className="card-img-top"
+            alt="..."
+          />
         )}
 
         <div className="card-body">
