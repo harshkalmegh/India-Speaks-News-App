@@ -3,7 +3,7 @@
   "totalResults": 5,
   "articles": [
     {
-      "source": { "id": "bbc-sport", "name": "BBC Sport" },
+      "source": {"id": "bbc-sport", "name": "BBC Sport"},
       "author": "BBC Sport",
       "title": "Obituary: Ray Illingworth",
       "description": "Ray Illingworth was one of the leading figures in English cricket for four decades as player, captain, commentator, administrator and coach.",
@@ -13,7 +13,7 @@
       "content": "Illingworth was 61 when he became England's chairman of selectors - taking on the dual role of coach the following year\r\nRay Illingworth, who was one of the leading figures in English cricket for the… [+6182 chars]"
     },
     {
-      "source": { "id": "bbc-sport", "name": "BBC Sport" },
+      "source": {"id": "bbc-sport", "name": "BBC Sport"},
       "author": "BBC Sport",
       "title": "BBQs and backyard cricket - a Christmas with the Langers",
       "description": "Former England opener Michael Carberry describes his Christmas at Justin Langer's house and explains what the Australia coach is like.",
@@ -23,7 +23,7 @@
       "content": "Justin Langer's Australia lead the Ashes series against England 2-0. The third Test begins in Melbourne at 23:30 GMT on 25 December\r\nTo many he is the intense, some even say difficult, coach of Austr… [+4911 chars]"
     },
     {
-      "source": { "id": "bbc-sport", "name": "BBC Sport" },
+      "source": {"id": "bbc-sport", "name": "BBC Sport"},
       "author": "BBC Sport",
       "title": "England make four changes for third Test",
       "description": "Zak Crawley and Jonny Bairstow are among four changes made by England for the must-win third Test against Australia at the Melbourne Cricket Ground.",
@@ -33,7 +33,7 @@
       "content": "England have made four changes to their team for the third Ashes Test against Australia, which starts at 23:30 GMT on Saturday in Melbourne.\r\nOpener Rory Burns and middle-order batsman Ollie Pope mak… [+429 chars]"
     },
     {
-      "source": { "id": "espn-cric-info", "name": "ESPN Cric Info" },
+      "source": {"id": "espn-cric-info", "name": "ESPN Cric Info"},
       "author": null,
       "title": "PCB hands Umar Akmal three-year ban from all cricket | ESPNcricinfo.com",
       "description": "Penalty after the batsman pleaded guilty to not reporting corrupt approaches | ESPNcricinfo.com",
@@ -43,7 +43,7 @@
       "content": "Umar Akmal's troubled cricket career has hit its biggest roadblock yet, with the PCB handing him a ban from all representative cricket for three years after he pleaded guilty of failing to report det… [+1506 chars]"
     },
     {
-      "source": { "id": "espn-cric-info", "name": "ESPN Cric Info" },
+      "source": {"id": "espn-cric-info", "name": "ESPN Cric Info"},
       "author": null,
       "title": "What we learned from watching the 1992 World Cup final in full again | ESPNcricinfo.com",
       "description": "Wides, lbw calls, swing - plenty of things were different in white-ball cricket back then | ESPNcricinfo.com",
