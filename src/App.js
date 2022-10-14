@@ -3,6 +3,7 @@ import React, {Suspense} from 'react';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import LoadingBar from 'react-top-loading-bar';
 import {useState} from 'react';
+import NewsDetail from './Components/NewsDetail';
 
 const NavBar = React.lazy(() => import('./Components/NavBar'));
 const News = React.lazy(() => import('./Components/News'));
@@ -12,10 +13,10 @@ function App() {
   let apiKey = '9144bd5aec61439fa30794031bd04725';
   return (
     <div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <BrowserRouter>
-          <NavBar />
-          <LoadingBar color="#f11946" progress={progress} onLoaderFinished={() => setProgress(0)} />
+      <BrowserRouter>
+        <NavBar />
+        <LoadingBar color="#f11946" progress={progress} onLoaderFinished={() => setProgress(0)} />
+        <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route
               exact
@@ -187,9 +188,10 @@ function App() {
                 />
               }
             />
+            <Route exact path="/newsDetails" element={<NewsDetail />} />
           </Routes>
-        </BrowserRouter>
-      </Suspense>
+        </Suspense>
+      </BrowserRouter>
     </div>
   );
 }
