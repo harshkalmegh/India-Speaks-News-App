@@ -137,7 +137,6 @@ function News(props) {
           }
         }
         setLoading(true);
-        // console.log(url);
         setArticles([...articles, ...url.results]);
         setTotalResults(url.totalResults);
         setLoading(false);
@@ -225,6 +224,7 @@ function News(props) {
                         author={element.creator}
                         date={`${element.pubDate}z`}
                         source={element.source_id}
+                        content={element.content}
                       />
                     </div>
                   );
