@@ -3,9 +3,12 @@ import React, {Suspense} from 'react';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import LoadingBar from 'react-top-loading-bar';
 import {useState} from 'react';
-import NewsDetail from './Components/NewsDetail';
 
 const NavBar = React.lazy(() => import('./Components/NavBar'));
+const ContactUs = React.lazy(() => import('./Components/ContactUs'));
+const AboutUs = React.lazy(() => import('./Components/AboutUs'));
+const NewsDetail = React.lazy(() => import('./Components/NewsDetail'));
+const PrivacyPolicy = React.lazy(() => import('./Components/PrivacyPolicy'));
 const News = React.lazy(() => import('./Components/News'));
 
 function App() {
@@ -189,6 +192,9 @@ function App() {
               }
             />
             <Route exact path="/newsDetails" element={<NewsDetail />} />
+            <Route exact path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route exact path="/contact-us" element={<ContactUs />} />
+            <Route exact path="/about-us" element={<AboutUs />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
