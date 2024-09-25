@@ -1,5 +1,5 @@
 import React from 'react';
-import {useLinkPreview} from 'get-link-preview';
+// import {useLinkPreview} from 'get-link-preview';
 import {useLocation, useNavigate} from 'react-router-dom';
 
 function NewsDetail() {
@@ -10,7 +10,7 @@ function NewsDetail() {
       navigate('/');
     }
   }, [location.state, navigate]);
-  const {data} = useLinkPreview(location.state.props.newsUrl);
+  // const {data} = useLinkPreview(location.state.props.newsUrl);
   return (
     <div style={{padding: '60px'}}>
       <div
@@ -47,7 +47,7 @@ function NewsDetail() {
           />
         ) : (
           <img
-            src={data ? data.image : ''}
+            src={''}
             style={{
               display: 'flex',
               alignContent: 'center',
