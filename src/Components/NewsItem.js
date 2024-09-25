@@ -1,10 +1,10 @@
 import React from 'react';
-import {useLinkPreview} from 'get-link-preview';
+// import {useLinkPreview} from 'get-link-preview';
 import {Link} from 'react-router-dom';
 
 function NewsItem(props) {
   let {title, description, imageUrl, newsUrl, author, date, source} = props;
-  const {data} = useLinkPreview(newsUrl);
+  // const {data} = useLinkPreview(newsUrl);
   return (
     <div className="my-3">
       <div className="card">
@@ -22,7 +22,8 @@ function NewsItem(props) {
           <img src={imageUrl} className="card-img-top" alt="..." />
         ) : (
           // @ts-ignore
-          <img src={data ? data.image : ''} className="card-img-top" alt="..." />
+          ''
+          // <img src={data ? data.image : ''} className="card-img-top" alt="..." />
         )}
         <div className="card-body">
           <h1 className="card-title">{title}</h1>
