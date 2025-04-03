@@ -2,7 +2,6 @@ import React, {useState, useEffect, Suspense} from 'react';
 import PropTypes from 'prop-types';
 import {GetRequest} from './Utilities/Network/Index';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useNavigate } from 'react-router-dom';
 
 const NewsItem = React.lazy(() => import('./NewsItem'));
 const Spinner = React.lazy(() => import('./Spinner'));
@@ -19,8 +18,6 @@ function News(props) {
   const capitalizeFirstLetter = string => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
-
- const navigate = useNavigate();
 
   const newsSearches = ["indore", "madhya pradesh", "ujjain", "dewas", "dhar", "khargone", "khandwa", "mandsaur", "ratlam", "jhabua", "alirajpur", "barwani", "burhanpur", "amravati", "maharashtra", "आरएसएस"  ];
 
@@ -245,7 +242,7 @@ function News(props) {
                   setArticles([]);
                   setLoading(false);
                   setInput('');
-                  navigate("/search")
+                  window.location.reload();
                 }}
               >
                 Reset
