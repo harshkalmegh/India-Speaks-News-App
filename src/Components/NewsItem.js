@@ -1,6 +1,5 @@
 import React from 'react';
 // import {useLinkPreview} from 'get-link-preview';
-import {Link} from 'react-router-dom';
 
 function NewsItem(props) {
   let {title, description, imageUrl, newsUrl, author, date, source} = props;
@@ -34,11 +33,11 @@ function NewsItem(props) {
               {new Date(date).toDateString()}
             </small>
           </p>
-          <Link to={'/newsDetails'} state={{props}}>
+          <a href={newsUrl} target="_blank" rel="noopener noreferrer">
             <button className="btn btn-sm btn-dark" style={{float: 'right'}}>
               Read More
             </button>
-          </Link>
+          </a>
         </div>
       </div>
     </div>
