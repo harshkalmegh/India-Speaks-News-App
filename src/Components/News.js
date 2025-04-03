@@ -2,6 +2,7 @@ import React, {useState, useEffect, Suspense} from 'react';
 import PropTypes from 'prop-types';
 import {GetRequest} from './Utilities/Network/Index';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useNavigate } from 'react-router-dom';
 
 const NewsItem = React.lazy(() => import('./NewsItem'));
 const Spinner = React.lazy(() => import('./Spinner'));
@@ -18,6 +19,10 @@ function News(props) {
   const capitalizeFirstLetter = string => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
+
+ const navigate = useNavigate();
+
+  const newsSearches = ["indore", "madhya pradesh", "ujjain", "dewas", "dhar", "khargone", "khandwa", "mandsaur", "ratlam", "jhabua", "alirajpur", "barwani", "burhanpur", "amravati", "maharashtra", "आरएसएस"  ];
 
   useEffect(() => {
     if (input === '') {
@@ -218,6 +223,7 @@ function News(props) {
                 type="text"
                 className="SearchNews"
                 placeholder="Search Here"
+                value={input}
                 onChange={e => {
                   setInput(e.target.value);
                 }}
@@ -239,10 +245,25 @@ function News(props) {
                   setArticles([]);
                   setLoading(false);
                   setInput('');
+                  navigate("/search")
                 }}
               >
                 Reset
               </button>
+              <div className="newsSearches" style={{ textAlign: 'center' }}>
+                {newsSearches.map((item, index) => (
+                  <button
+                    key={index}
+                    className="btn btn-outline-primary btn-sm m-1"
+                    onClick={() => {
+                      setInput(item); // Set the clicked item as the input
+                      setSearch(true); // Trigger the search
+                    }}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
             </>
           ) : (
             ''
