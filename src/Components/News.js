@@ -2,13 +2,14 @@ import React, {useState, useEffect, Suspense} from 'react';
 import PropTypes from 'prop-types';
 import {GetRequest} from './Utilities/Network/Index';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import axios from 'axios';
 
 const NewsItem = React.lazy(() => import('./NewsItem'));
 const Spinner = React.lazy(() => import('./Spinner'));
 
 function News(props) {
   const [articles, setArticles] = useState([]);
-  const [, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
   const [input, setInput] = useState('');
@@ -19,7 +20,24 @@ function News(props) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
-  const newsSearches = ["indore", "madhya pradesh", "ujjain", "dewas", "dhar", "khargone", "khandwa", "mandsaur", "ratlam", "jhabua", "alirajpur", "barwani", "burhanpur", "amravati", "maharashtra", "आरएसएस"  ];
+  const newsSearches = [
+    'indore',
+    'madhya pradesh',
+    'ujjain',
+    'dewas',
+    'dhar',
+    'khargone',
+    'khandwa',
+    'mandsaur',
+    'ratlam',
+    'jhabua',
+    'alirajpur',
+    'barwani',
+    'burhanpur',
+    'amravati',
+    'maharashtra',
+    'आरएसएस',
+  ];
 
   useEffect(() => {
     if (input === '') {
@@ -206,6 +224,26 @@ function News(props) {
     }
   }
 
+  const [headlines, setHeadlines] = useState([]);
+
+  const fetchTrendingNews = async () => {
+    const API_KEY = 'a366374da3f46fbd0ba3093b4430d982'; // 🔁 Replace with your real key
+    const url = `https://gnews.io/api/v4/top-headlines?lang=hi&country=in&max=10&token=${API_KEY}`;
+
+    try {
+      const response = await axios.get(url);
+      setHeadlines(response.data.articles);
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrendingNews();
+  }, []);
+
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
@@ -247,7 +285,7 @@ function News(props) {
               >
                 Reset
               </button>
-              <div className="newsSearches" style={{ textAlign: 'center' }}>
+              <div className="newsSearches" style={{textAlign: 'center'}}>
                 {newsSearches.map((item, index) => (
                   <button
                     key={index}
@@ -260,6 +298,25 @@ function News(props) {
                     {item}
                   </button>
                 ))}
+              </div>
+              <div className="containerTopHead">
+                <div className="news-cardTopHead">
+                  <h1 className="titleTopHead">🇮🇳 Top 10 Trending News Headlines in India</h1>
+                  {loading ? (
+                    <p className="loadingTopHead">Loading...</p>
+                  ) : (
+                    <ul className="news-listTopHead">
+                      {headlines.map((article, index) => (
+                        <li key={index} className="news-itemTopHead">
+                          <a href={article.url} target="_blank" rel="noopener noreferrer">
+                            {index + 1}. {article.title}
+                          </a>
+                          <p className="timestampTopHead">{new Date(article.publishedAt).toLocaleString()}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             </>
           ) : (
