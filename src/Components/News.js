@@ -15,6 +15,7 @@ function News(props) {
   const [input, setInput] = useState('');
   const [search, setSearch] = useState(false);
   const [nextPage, setNextPage] = useState('');
+  const [headlines, setHeadlines] = useState([]);
 
   const capitalizeFirstLetter = string => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -23,17 +24,17 @@ function News(props) {
   const newsSearches = [
     'indore',
     'madhya pradesh',
-    'ujjain',
-    'dewas',
-    'dhar',
-    'khargone',
-    'khandwa',
-    'mandsaur',
-    'ratlam',
-    'jhabua',
-    'alirajpur',
-    'barwani',
-    'burhanpur',
+    // 'ujjain',
+    // 'dewas',
+    // 'dhar',
+    // 'khargone',
+    // 'khandwa',
+    // 'mandsaur',
+    // 'ratlam',
+    // 'jhabua',
+    // 'alirajpur',
+    // 'barwani',
+    // 'burhanpur',
     'amravati',
     'maharashtra',
     'आरएसएस',
@@ -224,11 +225,9 @@ function News(props) {
     }
   }
 
-  const [headlines, setHeadlines] = useState([]);
-
   const fetchTrendingNews = async () => {
     const API_KEY = 'a366374da3f46fbd0ba3093b4430d982'; // 🔁 Replace with your real key
-    const url = `https://gnews.io/api/v4/top-headlines?lang=en&country=in&max=10&token=${API_KEY}`;
+    const url = `https://gnews.io/api/v4/top-headlines?lang=en&country=in&token=${API_KEY}`;
 
     try {
       const response = await axios.get(url);
@@ -304,34 +303,38 @@ function News(props) {
                   </button>
                 ))}
               </div>
-              <div className="containerTopHead">
-                <div className="news-cardTopHead">
-                  <h1 className="titleTopHead">🇮🇳 Top 10 Trending News Headlines in India</h1>
-                  {loading ? (
-                    <p className="loadingTopHead">Loading...</p>
-                  ) : (
-                    <ul className="news-listTopHead">
-                      {headlines.map((article, index) => (
-                        <li key={index} className="news-itemTopHead">
-                          <a href={article.url} target="_blank" rel="noopener noreferrer">
-                            {index + 1}. {article.title}
-                          </a>
-                          <br/>
-                          <a
-                            href={getGoogleTranslateLink(article.title)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="translate-link"
-                          >
-                             🔄 Translate to Hindi
-                          </a>
-                          <p className="timestampTopHead">{new Date(article.publishedAt).toLocaleString()}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+              {articles.length === 0 && (
+                <div className="containerTopHead">
+                  <div className="news-cardTopHead">
+                    <h1 className="titleTopHead">🇮🇳 Top 10 Trending News Headlines in India</h1>
+                    {loading ? (
+                      <p className="loadingTopHead">Loading...</p>
+                    ) : (
+                      <ul className="news-listTopHead">
+                        {headlines.map((article, index) => (
+                          <li key={index} className="news-itemTopHead">
+                            <a href={article.url} target="_blank" rel="noopener noreferrer">
+                              {index + 1}. {article.title}
+                            </a>
+                            <br />
+                            <a
+                              href={getGoogleTranslateLink(article.title)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="translate-link"
+                            >
+                              🔄 Translate to Hindi
+                            </a>
+                            <p className="timestampTopHead">
+                              {new Date(article.publishedAt).toLocaleString()}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </>
           ) : (
             ''
