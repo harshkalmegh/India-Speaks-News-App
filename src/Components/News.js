@@ -228,7 +228,7 @@ function News(props) {
 
   const fetchTrendingNews = async () => {
     const API_KEY = 'a366374da3f46fbd0ba3093b4430d982'; // 🔁 Replace with your real key
-    const url = `https://gnews.io/api/v4/top-headlines?lang=eng&country=in&max=10&token=${API_KEY}`;
+    const url = `https://gnews.io/api/v4/top-headlines?lang=en&country=in&max=10&token=${API_KEY}`;
 
     try {
       const response = await axios.get(url);
