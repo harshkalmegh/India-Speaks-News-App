@@ -244,6 +244,11 @@ function News(props) {
     fetchTrendingNews();
   }, []);
 
+  const getGoogleTranslateLink = text => {
+    const encoded = encodeURIComponent(text);
+    return `https://translate.google.com/?sl=en&tl=hi&text=${encoded}&op=translate`;
+  };
+
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
@@ -310,6 +315,15 @@ function News(props) {
                         <li key={index} className="news-itemTopHead">
                           <a href={article.url} target="_blank" rel="noopener noreferrer">
                             {index + 1}. {article.title}
+                          </a>
+                          <br/>
+                          <a
+                            href={getGoogleTranslateLink(article.title)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="translate-link"
+                          >
+                             🔄 Translate to Hindi
                           </a>
                           <p className="timestampTopHead">{new Date(article.publishedAt).toLocaleString()}</p>
                         </li>
