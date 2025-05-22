@@ -268,42 +268,46 @@ function News(props) {
                 }}
                 onKeyDown={_handleKeyDown}
               />
-              <button
-                className="SearchNewsButton"
-                id="myBtnSearch"
-                onClick={() => {
-                  setSearch(true);
-                }}
-              >
-                Search
-              </button>
-              <button
-                className="SearchNewsButton"
-                id="myBtnSearch"
-                onClick={() => {
-                  setArticles([]);
-                  setLoading(false);
-                  setInput('');
-                  window.location.reload();
-                }}
-              >
-                Reset
-              </button>
-              <div className="newsSearches" style={{textAlign: 'center'}}>
-                {newsSearches.map((item, index) => (
-                  <button
-                    key={index}
-                    className="btn btn-outline-primary btn-sm m-1"
-                    onClick={() => {
-                      setInput(item); // Set the clicked item as the input
-                      setSearch(true); // Trigger the search
-                    }}
-                  >
-                    {item}
-                  </button>
-                ))}
+              <div className="SearchNewsIcon">
+                <button
+                  className="SearchNewsButton"
+                  id="myBtnSearch"
+                  onClick={() => {
+                    setSearch(true);
+                  }}
+                >
+                  Search
+                </button>
+                <button
+                  className="SearchNewsButton"
+                  id="myBtnSearch"
+                  onClick={() => {
+                    setArticles([]);
+                    setLoading(false);
+                    setInput('');
+                    window.location.reload();
+                  }}
+                >
+                  Reset
+                </button>
               </div>
               {articles.length === 0 && (
+                <div className="newsSearches" style={{textAlign: 'center'}}>
+                  {newsSearches.map((item, index) => (
+                    <button
+                      key={index}
+                      className="btn btn-outline-primary btn-sm m-1"
+                      onClick={() => {
+                        setInput(item); // Set the clicked item as the input
+                        setSearch(true); // Trigger the search
+                      }}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {articles.length === 0 && headlines.length !== 0 && (
                 <div className="containerTopHead">
                   <div className="news-cardTopHead">
                     <h1 className="titleTopHead">🇮🇳 Top 10 Trending News Headlines in India</h1>
