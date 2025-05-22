@@ -289,3 +289,56 @@ textarea.input100 {
     display: block;
   }
 }
+
+.containerTopHead {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.news-cardTopHead {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+}
+
+.titleTopHead {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #1a237e;
+}
+
+.loadingTopHead {
+  font-size: 16px;
+  color: #777;
+}
+
+.news-listTopHead {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.news-itemTopHead {
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.news-itemTopHead a {
+  text-decoration: none;
+  color: #1565c0;
+  font-weight: 500;
+  font-size: 17px;
+}
+
+.news-itemTopHead a:hover {
+  text-decoration: underline;
+}
+
+.timestampTopHead {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
