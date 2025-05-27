@@ -16,6 +16,7 @@ function News(props) {
   const [search, setSearch] = useState(false);
   const [nextPage, setNextPage] = useState('');
   const [headlines, setHeadlines] = useState([]);
+  const [keywords, setKeywords] = useState([]);
 
   const capitalizeFirstLetter = string => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -248,6 +249,88 @@ function News(props) {
     return `https://translate.google.com/?sl=en&tl=hi&text=${encoded}&op=translate`;
   };
 
+  useEffect(() => {
+    // RSS feed for Google Trends Daily - India
+    const googleTrendsRssUrl = 'https://trends.google.com/trending/rss?geo=IN&hours=48&sort=relevance';
+    // Using rss2json API to convert RSS to JSON and bypass CORS
+    const rssToJsonApiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
+      googleTrendsRssUrl,
+    )}`;
+
+    const fetchKeywords = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(rssToJsonApiUrl);
+
+        // Try to parse the response as JSON. rss2json usually sends JSON even for its own errors.
+        let data;
+        try {
+          data = await response.json();
+          console.log('Fetched data from rss2json:', data);
+        } catch (jsonError) {
+          // This catch block handles cases where the response body isn't valid JSON.
+          // This might happen for network errors before reaching rss2json, or if rss2json itself returns non-JSON.
+          console.error('Failed to parse JSON response from RSS service:', jsonError);
+          throw new Error(
+            `Failed to parse response from RSS service. HTTP status: ${response.status} ${response.statusText}. The service might be down or returning an unexpected format.`,
+          );
+        }
+
+        if (!response.ok) {
+          // HTTP error (e.g., 4xx, 5xx from rss2json server itself, not from Google Trends source)
+          // 'data' (parsed JSON above) might contain an error message from rss2json (e.g., {status: 'error', message: '...'})
+          throw new Error(data.message || `RSS service connection error. HTTP status: ${response.status}.`);
+        }
+
+        // At this point, response.ok was true (HTTP 200).
+        // Now check the 'status' field within the JSON payload from rss2json.
+        if (data.status === 'ok' && data.items) {
+          // Successfully fetched and parsed data from rss2json
+          const fetchedKeywords = data.items.slice(0, 10).map((item, index) => {
+            let searches = 'N/A';
+            if (item.description) {
+              // Example: <ht:approx_traffic>50,000+</ht:approx_traffic>
+              const trafficMatch = item.description.match(/<ht:approx_traffic>(.*?)<\/ht:approx_traffic>/);
+              if (trafficMatch && trafficMatch[1]) {
+                searches = trafficMatch[1].replace(/,/g, '') + ' searches'; // Remove commas for consistency
+              }
+            }
+            // Fallback if not in description, check title (less common for daily trends RSS)
+            if (searches === 'N/A' && item.title) {
+              const titleTrafficMatch = item.title.match(/:\s*([\d,KkMm]+\+)\s*searches/);
+              if (titleTrafficMatch && titleTrafficMatch[1]) {
+                searches = titleTrafficMatch[1];
+              }
+            }
+
+            return {
+              id: item.guid || item.link || `keyword-${index}`, // Ensure a unique key, fallback to link or index
+              name: item.title.replace(/:\s*[\d,KkMm]+\+?\s*searches$/, '').trim(), // Clean up title if it has search count
+              searches: searches,
+              link: item.link,
+              pubDate: item.pubDate,
+            };
+          });
+          setKeywords(fetchedKeywords);
+        } else {
+          // rss2json returned HTTP 200 OK, but its internal processing failed (e.g., couldn't fetch the source RSS)
+          // data.message should contain the specific error like "Cannot download this RSS feed..."
+          throw new Error(data.message || 'RSS conversion service reported an issue processing the feed.');
+        }
+      } catch (err) {
+        // This will catch errors from fetch (network), response.json(), or errors thrown explicitly above.
+        console.error('Detailed error in fetchKeywords:', err); // Log the full error for debugging
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchKeywords();
+    // Optional: set up a timer to refresh data periodically
+    // const intervalId = setInterval(fetchKeywords, 30 * 60 * 1000); // Refresh every 30 minutes
+    // return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
@@ -303,6 +386,19 @@ function News(props) {
                       }}
                     >
                       {item}
+                    </button>
+                  ))}
+                  <br />
+                  {keywords.map((item, index) => (
+                    <button
+                      key={index}
+                      className="btn btn-outline-primary btn-sm m-1"
+                      onClick={() => {
+                        setInput(item.name); // Set the clicked item as the input
+                        setSearch(true); // Trigger the search
+                      }}
+                    >
+                      {item.name}
                     </button>
                   ))}
                 </div>
