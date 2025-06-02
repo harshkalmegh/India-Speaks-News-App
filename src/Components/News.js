@@ -38,7 +38,7 @@ function News(props) {
     // 'burhanpur',
     'amravati',
     'maharashtra',
-    'आरएसएस',
+    // 'आरएसएस',
   ];
 
   useEffect(() => {
