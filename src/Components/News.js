@@ -38,7 +38,7 @@ function News(props) {
     // 'burhanpur',
     'amravati',
     'maharashtra',
-    // 'आरएसएस',
+    'आरएसएस',
   ];
 
   useEffect(() => {
@@ -251,7 +251,7 @@ function News(props) {
 
   useEffect(() => {
     // RSS feed for Google Trends Daily - India
-    const googleTrendsRssUrl = 'https://trends.google.com/trending/rss?geo=IN&hours=48&sort=relevance';
+    const googleTrendsRssUrl = 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en';
     // Using rss2json API to convert RSS to JSON and bypass CORS
     const rssToJsonApiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
       googleTrendsRssUrl,
@@ -390,16 +390,16 @@ function News(props) {
                   ))}
                   <br />
                   {keywords.map((item, index) => (
-                    <button
+                    <a
                       key={index}
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="btn btn-outline-primary btn-sm m-1"
-                      onClick={() => {
-                        setInput(item.name); // Set the clicked item as the input
-                        setSearch(true); // Trigger the search
-                      }}
+                      style={{display: 'inline-block', textDecoration: 'none'}}
                     >
                       {item.name}
-                    </button>
+                    </a>
                   ))}
                 </div>
               )}
