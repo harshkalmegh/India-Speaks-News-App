@@ -390,16 +390,28 @@ function News(props) {
                   ))}
                   <br />
                   {keywords.map((item, index) => (
-                    <a
-                      key={index}
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-outline-primary btn-sm m-1"
-                      style={{display: 'inline-block', textDecoration: 'none'}}
-                    >
-                      {item.name}
-                    </a>
+                    <>
+                      <a
+                        key={index}
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-outline-primary btn-sm m-1"
+                        style={{display: 'inline-block', textDecoration: 'none'}}
+                      >
+                        {item.name}
+                      </a>
+                      
+                      {/* <a
+                        href={getGoogleTranslateLink(item.name)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="translate-link"
+                      >
+                        🔄 Translate to Hindi
+                      </a> */}
+                      <br />
+                    </>
                   ))}
                 </div>
               )}
