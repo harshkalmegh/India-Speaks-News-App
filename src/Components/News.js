@@ -17,6 +17,7 @@ function News(props) {
   const [nextPage, setNextPage] = useState('');
   const [headlines, setHeadlines] = useState([]);
   const [keywords, setKeywords] = useState([]);
+  const [trendsKeywords, setTrendsKeywords] = useState([]);
 
   const capitalizeFirstLetter = string => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -125,7 +126,6 @@ function News(props) {
               }
             }
           }
-          console.log('ln 85', url.nextPage);
           setLoading(true);
           setArticles([...articles, ...url.results]);
           setTotalResults(url.totalResults);
@@ -201,7 +201,6 @@ function News(props) {
             }
           }
         }
-        console.log('ln 140', url.nextPage);
         setLoading(true);
         setArticles([...articles, ...url.results]);
         setTotalResults(url.totalResults);
@@ -234,7 +233,6 @@ function News(props) {
       const response = await axios.get(url);
       setHeadlines(response.data.articles);
     } catch (error) {
-      console.error('Error fetching news:', error);
     } finally {
       setLoading(false);
     }
@@ -257,6 +255,12 @@ function News(props) {
       googleTrendsRssUrl,
     )}`;
 
+    const twitterTrendsApiUrl = 'https://twitter-trends5.p.rapidapi.com/twitter/request.php';
+
+    const body = new URLSearchParams({
+      woeid: '23424848',
+    });
+
     const fetchKeywords = async () => {
       setLoading(true);
       try {
@@ -266,7 +270,6 @@ function News(props) {
         let data;
         try {
           data = await response.json();
-          console.log('Fetched data from rss2json:', data);
         } catch (jsonError) {
           // This catch block handles cases where the response body isn't valid JSON.
           // This might happen for network errors before reaching rss2json, or if rss2json itself returns non-JSON.
@@ -325,6 +328,73 @@ function News(props) {
       }
     };
 
+    const fetchTrends = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(twitterTrendsApiUrl, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'x-rapidapi-key': 'ee8fc918e4mshaafbe7657594c9fp124bc3jsndf1496a8b3c7',
+            'x-rapidapi-host': 'twitter-trends5.p.rapidapi.com',
+          },
+          body: body.toString(),
+        });
+
+        // Try to parse the response as JSON. rss2json usually sends JSON even for its own errors.
+        let data;
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          // This catch block handles cases where the response body isn't valid JSON.
+          // This might happen for network errors before reaching rss2json, or if rss2json itself returns non-JSON.
+          console.error('Failed to parse JSON response from RSS service:', jsonError);
+          throw new Error(
+            `Failed to parse response from RSS service. HTTP status: ${response.status} ${response.statusText}. The service might be down or returning an unexpected format.`,
+          );
+        }
+
+        // At this point, response.ok was true (HTTP 200).
+        // Now check the 'status' field within the JSON payload from rss2json.
+        if (data.trends && data.trends.length > 0) {
+          // Successfully fetched and parsed data from rss2json
+          const fetchedKeywords = data.trends.slice(0, 30).map((item, index) => {
+            let searches = 'N/A';
+            if (item.description) {
+              // Example: <ht:approx_traffic>50,000+</ht:approx_traffic>
+              const trafficMatch = item.description.match(/<ht:approx_traffic>(.*?)<\/ht:approx_traffic>/);
+              if (trafficMatch && trafficMatch[1]) {
+                searches = trafficMatch[1].replace(/,/g, '') + ' searches'; // Remove commas for consistency
+              }
+            }
+            // Fallback if not in description, check title (less common for daily trends RSS)
+            if (searches === 'N/A' && item.title) {
+              const titleTrafficMatch = item.title.match(/:\s*([\d,KkMm]+\+)\s*searches/);
+              if (titleTrafficMatch && titleTrafficMatch[1]) {
+                searches = titleTrafficMatch[1];
+              }
+            }
+
+            return {
+              id: item.guid || item.link || `keyword-${index}`, // Ensure a unique key, fallback to link or index
+              name: item.name, // Clean up title if it has search count
+            };
+          });
+          setTrendsKeywords(fetchedKeywords);
+        } else {
+          // rss2json returned HTTP 200 OK, but its internal processing failed (e.g., couldn't fetch the source RSS)
+          // data.message should contain the specific error like "Cannot download this RSS feed..."
+          throw new Error(data.message || 'RSS conversion service reported an issue processing the feed.');
+        }
+      } catch (err) {
+        // This will catch errors from fetch (network), response.json(), or errors thrown explicitly above.
+        console.error('Detailed error in fetchKeywords:', err); // Log the full error for debugging
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrends();
     fetchKeywords();
     // Optional: set up a timer to refresh data periodically
     // const intervalId = setInterval(fetchKeywords, 30 * 60 * 1000); // Refresh every 30 minutes
@@ -389,6 +459,25 @@ function News(props) {
                     </button>
                   ))}
                   <br />
+                  {trendsKeywords.map((item, index) => (
+                    <>
+                      <button
+                        key={index}
+                        className="btn btn-outline-primary btn-sm m-1"
+                        onClick={() => {
+                          if(!item.name.includes('#')){
+                            setInput(item.name); // Set the clicked item as the input
+                            setSearch(true); // Trigger the search
+                          } else {
+                            alert('Sorry, this trend cannot be searched due to special characters in its name. Please try another trend.');
+                          }
+                        }}
+                      >
+                        {item.name}
+                      </button>
+                    </>
+                  ))}
+                  <br />
                   {keywords.map((item, index) => (
                     <>
                       <a
@@ -401,7 +490,6 @@ function News(props) {
                       >
                         {item.name}
                       </a>
-                      
                       {/* <a
                         href={getGoogleTranslateLink(item.name)}
                         target="_blank"
