@@ -1,8 +1,13 @@
 import './App.css';
-import React, {Suspense} from 'react';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import React, {Suspense, useState} from 'react';
+import {
+  createBrowserRouter,
+  Outlet,
+  RouterProvider,
+  ScrollRestoration,
+  useOutletContext,
+} from 'react-router-dom';
 import LoadingBar from 'react-top-loading-bar';
-import {useState} from 'react';
 
 const NavBar = React.lazy(() => import('./Components/NavBar'));
 const ContactUs = React.lazy(() => import('./Components/ContactUs'));
@@ -11,195 +16,60 @@ const NewsDetail = React.lazy(() => import('./Components/NewsDetail'));
 const PrivacyPolicy = React.lazy(() => import('./Components/PrivacyPolicy'));
 const News = React.lazy(() => import('./Components/News'));
 
-function App() {
+function AppLayout() {
   const [progress, setProgress] = useState(0);
-  let apiKey = '9144bd5aec61439fa30794031bd04725';
+
   return (
     <div>
-      <BrowserRouter>
+      <LoadingBar
+        color="#f11946"
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+        waitingTime={400}
+        loaderSpeed={500}
+        transitionTime={300}
+      />
+      <ScrollRestoration />
+      <Suspense fallback={<div>Loading...</div>}>
         <NavBar />
-        <LoadingBar color="#f11946" progress={progress} onLoaderFinished={() => setProgress(0)} />
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            <Route
-              exact
-              path="/"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key=""
-                  pageSize={6}
-                  country="in"
-                  category="top"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/politics"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="politics"
-                  pageSize={6}
-                  country="in"
-                  category="politics"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/world"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="world"
-                  pageSize={6}
-                  country="in"
-                  category="world"
-                  apiKey={apiKey}
-                />
-              }
-            />
-
-            <Route
-              exact
-              path="/business"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="business"
-                  pageSize={6}
-                  country="in"
-                  category="business"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/entertainment"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="entertainment"
-                  pageSize={6}
-                  country="in"
-                  category="entertainment"
-                  apiKey={apiKey}
-                />
-              }
-            />
-
-            <Route
-              exact
-              path="/health"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="health"
-                  pageSize={6}
-                  country="in"
-                  category="health"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/science"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="science"
-                  pageSize={6}
-                  country="in"
-                  category="science"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/sports"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="sports"
-                  pageSize={6}
-                  country="in"
-                  category="sports"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/technology"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="technology"
-                  pageSize={6}
-                  country="in"
-                  category="technology"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/food"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="food"
-                  pageSize={6}
-                  country="in"
-                  category="food"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/environment"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="environment"
-                  pageSize={6}
-                  country="in"
-                  category="environment"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/search"
-              element={
-                <News
-                  setProgress={setProgress}
-                  key="search"
-                  pageSize={6}
-                  country="in"
-                  category="search"
-                  apiKey={apiKey}
-                />
-              }
-            />
-            <Route exact path="/newsDetails" element={<NewsDetail />} />
-            <Route exact path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route exact path="/contact-us" element={<ContactUs />} />
-            <Route exact path="/about-us" element={<AboutUs />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+        <Outlet context={setProgress} />
+      </Suspense>
     </div>
   );
+}
+
+function NewsRoute({category}) {
+  const setProgress = useOutletContext();
+
+  return <News key={category} category={category} setProgress={setProgress} />;
+}
+
+const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      {path: '/', element: <NewsRoute category="top" />},
+      {path: '/politics', element: <NewsRoute category="politics" />},
+      {path: '/world', element: <NewsRoute category="world" />},
+      {path: '/business', element: <NewsRoute category="business" />},
+      {path: '/entertainment', element: <NewsRoute category="entertainment" />},
+      {path: '/health', element: <NewsRoute category="health" />},
+      {path: '/science', element: <NewsRoute category="science" />},
+      {path: '/sports', element: <NewsRoute category="sports" />},
+      {path: '/technology', element: <NewsRoute category="technology" />},
+      {path: '/food', element: <NewsRoute category="food" />},
+      {path: '/environment', element: <NewsRoute category="environment" />},
+      {path: '/search', element: <NewsRoute category="search" />},
+      {path: '/newsDetails', element: <NewsDetail />},
+      {path: '/privacy-policy', element: <PrivacyPolicy />},
+      {path: '/contact-us', element: <ContactUs />},
+      {path: '/about-us', element: <AboutUs />},
+    ],
+  },
+]);
+
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;

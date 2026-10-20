@@ -1,14 +1,11 @@
-import React, {Suspense} from 'react';
-
-const loading = React.lazy(() => import('./loading.gif'));
+import React from 'react';
 
 function Spinner() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className="text-center">
-        <img src={loading} alt="loading" />
-      </div>
-    </Suspense>
+    <div className="news-feed__loading" role="status" aria-label="Loading more stories">
+      <span className="news-feed__loading-spinner" aria-hidden="true" />
+      <span className="visually-hidden">Loading more stories</span>
+    </div>
   );
 }
 

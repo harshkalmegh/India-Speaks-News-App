@@ -1,46 +1,66 @@
 import React from 'react';
-// import {useLinkPreview} from 'get-link-preview';
 
-function NewsItem(props) {
-  let {title, description, imageUrl, newsUrl, author, date, source} = props;
-  // const {data} = useLinkPreview(newsUrl);
+function NewsItem({title, description, imageUrl, newsUrl, author, date, source}) {
+  const publishedAt = new Date(date);
+  const hasPublishedAt = !Number.isNaN(publishedAt.getTime());
+  const titleLanguage = /[\u0900-\u097F]/.test(title) ? 'hi' : 'en';
+  const descriptionLanguage = /[\u0900-\u097F]/.test(description || '') ? 'hi' : 'en';
+
   return (
-    <div className="my-3">
-      <div className="card">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            position: 'absolute',
-            right: '0',
-          }}
-        >
-          <span className="badge rounded-pill bg-danger">{source}</span>
+    <article className="news-card">
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          className="news-card__image"
+          alt={title ? `Image for ${title}` : 'News article'}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <div className="news-card__image-placeholder" aria-hidden="true">
+          <span>INDIA SPEAKS</span>
         </div>
-        {imageUrl ? (
-          <img src={imageUrl} className="card-img-top" alt="..." />
-        ) : (
-          // @ts-ignore
-          ''
-          // <img src={data ? data.image : ''} className="card-img-top" alt="..." />
-        )}
-        <div className="card-body">
-          <h1 className="card-title">{title}</h1>
-          <p className="card-text">{description}...</p>
-          <p className="card-text">
-            <small className="text-muted">
-              By {!author ? 'Anonymous' : author} on {new Date(date).toLocaleTimeString()}{' '}
-              {new Date(date).toDateString()}
-            </small>
+      )}
+      <div className="news-card__body">
+        {source && <span className="news-card__source">{source}</span>}
+        <h2 className="news-card__title" lang={titleLanguage}>
+          {title}
+        </h2>
+        {description && (
+          <p className="news-card__description" lang={descriptionLanguage}>
+            {description}
           </p>
-          <a href={newsUrl} target="_blank" rel="noopener noreferrer">
-            <button className="btn btn-sm btn-dark" style={{float: 'right'}}>
-              Read More
-            </button>
-          </a>
+        )}
+        <div className="news-card__footer">
+          <p className="news-card__meta">
+            {author ? `By ${author}` : 'India Speaks'}
+            {hasPublishedAt && (
+              <>
+                {' · '}
+                <time dateTime={publishedAt.toISOString()}>
+                  {publishedAt.toLocaleDateString(undefined, {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </time>
+              </>
+            )}
+          </p>
+          {newsUrl && (
+            <a
+              className="news-card__read-more"
+              href={newsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Read full story: ${title}`}
+            >
+              Read story <span aria-hidden="true">↗</span>
+            </a>
+          )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
