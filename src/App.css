@@ -956,6 +956,26 @@ input {
   padding: 22px 0;
 }
 
+.news-feed__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 20px;
+  padding: 16px;
+  border: 1px solid #ead7c9;
+  border-radius: 12px;
+  background: #fffaf6;
+  color: #704b35;
+}
+
+.news-feed__error p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .news-feed__loading-spinner {
   width: 24px;
   height: 24px;

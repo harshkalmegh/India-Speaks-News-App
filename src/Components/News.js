@@ -7,16 +7,8 @@ const NewsItem = React.lazy(() => import('./NewsItem'));
 const Spinner = React.lazy(() => import('./Spinner'));
 
 const API_KEYS = [
-  'pub_6879d4cafb3ed0fad900a2dd828177512d21',
-  'pub_68813d1cb70fe729b6aaab9e585c41d6d5d4',
-  'pub_6916b9b2ca77f2af651658ac6664207d137b',
-  'pub_691773564c6cc88fc0fb0fa52e1f3389a101',
   'pub_69185e9b582562890079695628ea412ef69c',
   'pub_69196c0a7d5b2498f5716de4a37b63790a42',
-  'pub_69206fe998104e6cd9c141719027e06873f7',
-  'pub_69211c566814e0d10a2f82f853254531e9e3',
-  'pub_69226de13f52bf066cf6b2851810bfd207b0',
-  'pub_69237c4e16b502b115847eae41bd56dd0262',
 ];
 
 const BASE_URL = 'https://newsdata.io/api/1/news';
@@ -33,7 +25,7 @@ const tryApiKeys = async (queryParams, signal) => {
   for (const key of API_KEYS) {
     if (signal?.aborted) return undefined;
     const url = `${BASE_URL}?apikey=${key}&${COMMON_PARAMS}${queryParams}`;
-    const result = await GetRequest(url, signal);
+    const result = await GetRequest(url, signal, 9000);
     if (result !== undefined) return result;
   }
   return undefined;
@@ -42,6 +34,8 @@ const tryApiKeys = async (queryParams, signal) => {
 function News({category = 'general', setProgress}) {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState(false);
+  const [feedRequest, setFeedRequest] = useState(0);
   const [page, setPage] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
   const [input, setInput] = useState('');
@@ -87,17 +81,20 @@ function News({category = 'general', setProgress}) {
           : `&category=${category}${pageParam}`;
 
       setLoading(true);
+      setFeedError(false);
       try {
-        const url = await tryApiKeys(queryParams, controller.signal);
+        const data = await tryApiKeys(queryParams, controller.signal);
 
-        if (url !== undefined && !controller.signal.aborted) {
-          setArticles(currentArticles => [...currentArticles, ...url.results]);
-          setTotalResults(url.totalResults);
-          setNextPage(url.nextPage || '');
+        if (data !== undefined && Array.isArray(data.results) && !controller.signal.aborted) {
+          setArticles(currentArticles => [...currentArticles, ...data.results]);
+          setTotalResults(data.totalResults || 0);
+          setNextPage(data.nextPage || '');
 
           if (category !== 'search') {
             setProgress(100);
           }
+        } else if (!controller.signal.aborted) {
+          setFeedError(true);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -109,7 +106,7 @@ function News({category = 'general', setProgress}) {
     updateNews();
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, category, search]);
+  }, [page, category, search, feedRequest]);
 
   const fetchMoreData = () => setPage(currentPage => currentPage + 1);
 
@@ -412,6 +409,18 @@ function News({category = 'general', setProgress}) {
             )
           }
         >
+          {feedError && (
+            <div className="news-feed__error" role="alert">
+              <p>Latest stories could not be loaded. Please check your connection and try again.</p>
+              <button
+                className="SearchNewsButton news-search__submit"
+                type="button"
+                onClick={() => setFeedRequest(request => request + 1)}
+              >
+                Try again
+              </button>
+            </div>
+          )}
           <div className="news-feed">
             <div className="news-feed__grid">
               {articles.map((element, index) => (
