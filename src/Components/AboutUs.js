@@ -42,6 +42,9 @@ function AboutUs() {
             <li>Follow links to the original publisher for more context.</li>
             <li>Use a responsive experience on mobile, tablet, or desktop.</li>
           </ul>
+          <Link className="about-guide-link" to="/news-literacy">
+            Read our guide to evaluating news <span aria-hidden="true">→</span>
+          </Link>
         </section>
       </div>
 

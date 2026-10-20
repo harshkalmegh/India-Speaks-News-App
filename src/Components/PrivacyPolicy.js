@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 const sections = [
   ['information', 'Information and how it is used'],
   ['services', 'Third-party services'],
+  ['advertising', 'Advertising'],
   ['choices', 'Your choices'],
   ['security', 'Security and links'],
   ['changes', 'Policy updates'],
@@ -71,6 +72,28 @@ function PrivacyPolicy() {
             <p>
               News articles link to their publishers. Opening an external link takes you to a site with its
               own privacy practices; please review that site’s policy.
+            </p>
+          </section>
+
+          <section id="advertising">
+            <h2>Advertising</h2>
+            <p>
+              This website includes Google AdSense code. If ads are served, Google and its partners may use
+              cookies or similar technologies to provide, measure, and personalize advertising based on your
+              visit to this and other websites. Learn more in{' '}
+              <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noreferrer">
+                Google’s advertising privacy information
+              </a>
+              .
+            </p>
+            <p>
+              You can review or change Google’s ad personalization settings at{' '}
+              <a href="https://adssettings.google.com/" target="_blank" rel="noreferrer">
+                Google Ad Settings
+              </a>
+              . Before serving personalized ads to visitors in the European Economic Area, the United
+              Kingdom, or Switzerland, the site owner must configure a Google-certified consent management
+              platform as required by Google’s policies.
             </p>
           </section>
 

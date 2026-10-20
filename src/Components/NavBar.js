@@ -14,6 +14,7 @@ const sections = [
   ['Food', '/food'],
   ['Environment', '/environment'],
   ['Search', '/search'],
+  ['Reader’s guide', '/news-literacy'],
   ['Privacy', '/privacy-policy'],
   ['Contact', '/contact-us'],
   ['About', '/about-us'],
