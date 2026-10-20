@@ -28,7 +28,7 @@ function News(props) {
     'madhya pradesh',
     'amravati',
     'maharashtra',
-    // 'आरएसएस',
+    'आरएसएस'
   ];
 
   useEffect(() => {
