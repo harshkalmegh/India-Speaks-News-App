@@ -55,9 +55,8 @@ function PrivacyPolicy() {
               will be handled by your email provider and the recipient once you send it.
             </p>
             <p>
-              Saved stories and preferred topic shortcuts are kept in local storage in the browser on the
-              device where you set them. Search phrases are included in the search page URL so a search can
-              be reopened or shared.
+              Saved stories are kept in local storage in the browser on the device where you save them.
+              Search phrases are included in the search page URL so a search can be reopened or shared.
               We have not found app-managed account profiles, payment collection, or analytics/pixel
               integrations in the current website code. Your browser, hosting provider, or third-party
               services may still process technical data as part of delivering the website.
@@ -106,8 +105,8 @@ function PrivacyPolicy() {
             <p>
               You can choose what to search for and whether to open external stories. You do not need to
               submit personal details to browse the news. You can remove saved stories using the Saved
-              Stories page, update your topic shortcuts, or clear this site's local storage in your browser.
-              If you contact us, include only the information needed to respond.
+              Stories page or clear this site's local storage in your browser. If you contact us, include
+              only the information needed to respond.
             </p>
           </section>
 

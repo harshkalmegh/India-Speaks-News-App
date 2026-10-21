@@ -1,22 +1,16 @@
 import React from 'react';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import NavBar from './NavBar';
 
-beforeEach(() => {
-  window.localStorage.clear();
-});
-
-test('stores preferred topic shortcuts on this device', () => {
+test('renders the standard news section navigation without customization controls', () => {
   render(
     <MemoryRouter>
       <NavBar />
     </MemoryRouter>,
   );
 
-  fireEvent.click(screen.getByText('Customize topic shortcuts'));
-  fireEvent.click(screen.getByRole('checkbox', {name: 'Science'}));
-
-  expect(screen.getByRole('navigation', {name: 'Your preferred topics'})).toHaveTextContent('Science');
-  expect(JSON.parse(window.localStorage.getItem('india-speaks:preferred-topics'))).toEqual(['/science']);
+  expect(screen.getByRole('navigation', {name: 'News sections'})).toHaveTextContent('Science');
+  expect(screen.queryByText('Customize topic shortcuts')).not.toBeInTheDocument();
+  expect(screen.queryByRole('navigation', {name: 'Your preferred topics'})).not.toBeInTheDocument();
 });
