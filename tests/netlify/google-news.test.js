@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const {afterEach, test} = require('node:test');
-const {handler, parseGoogleNewsFeed} = require('./google-news');
+const {handler, parseGoogleNewsFeed} = require('../../netlify/functions/google-news');
 
 const originalFetch = global.fetch;
 
@@ -8,7 +8,7 @@ afterEach(() => {
   global.fetch = originalFetch;
 });
 
-test('parses RSS titles, links, identifiers, and publication dates', () => {
+test('parses RSS content and publication metadata', () => {
   const items = parseGoogleNewsFeed(
     '<rss><channel><item><title><![CDATA[A &amp; B]]></title>' +
       '<link>https://example.com/?a=1&amp;b=2</link><guid>story-1</guid>' +
