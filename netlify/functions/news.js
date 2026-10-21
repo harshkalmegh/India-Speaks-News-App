@@ -26,7 +26,7 @@ const jsonResponse = (statusCode, data, cacheControl = 'no-store') => ({
 });
 
 const getApiKeys = () =>
-  ('pub_68813d1cb70fe729b6aaab9e585c41d6d5d4')
+  (process.env.NEWSDATA_API_KEY || '')
     .split(',')
     .map(key => key.trim())
     .filter(Boolean);
