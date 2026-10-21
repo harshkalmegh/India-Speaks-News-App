@@ -8,6 +8,8 @@ import {
   ScrollRestoration,
   useLocation,
   useOutletContext,
+  useRouteError,
+  useSearchParams,
 } from 'react-router-dom';
 import LoadingBar from 'react-top-loading-bar';
 
@@ -18,6 +20,7 @@ const NewsDetail = React.lazy(() => import('./Components/NewsDetail'));
 const PrivacyPolicy = React.lazy(() => import('./Components/PrivacyPolicy'));
 const NewsLiteracy = React.lazy(() => import('./Components/NewsLiteracy'));
 const News = React.lazy(() => import('./Components/News'));
+const SavedStories = React.lazy(() => import('./Components/SavedStories'));
 
 const pageMetadata = {
   '/': {
@@ -88,26 +91,46 @@ const pageMetadata = {
     title: 'News Story | India Speaks',
     description: 'View a news story and follow the link to its original publisher.',
   },
+  '/story': {
+    title: 'News Story | India Speaks',
+    description: 'View a story preview and follow the link to its original publisher.',
+  },
+  '/saved': {
+    title: 'Saved Stories | India Speaks',
+    description: 'Return to stories you saved on this device.',
+  },
 };
 
 function RouteMetadata() {
   const {pathname} = useLocation();
+  const [searchParams] = useSearchParams();
 
   React.useEffect(() => {
-    const metadata = pageMetadata[pathname] || pageMetadata['/'];
-    document.title = metadata.title;
+    const metadata = pageMetadata[pathname];
+    const isStory = pathname === '/story' || pathname === '/newsDetails';
+    const title = isStory && searchParams.get('title')
+      ? `${searchParams.get('title')} | India Speaks`
+      : metadata
+        ? metadata.title
+        : 'Page not found | India Speaks';
+    const description = isStory && searchParams.get('description')
+      ? searchParams.get('description').slice(0, 250)
+      : metadata
+        ? metadata.description
+        : 'The requested India Speaks page could not be found.';
+    document.title = title;
 
-    let description = document.querySelector('meta[name="description"]');
-    if (!description) {
-      description = document.createElement('meta');
-      description.name = 'description';
-      document.head.appendChild(description);
+    let descriptionTag = document.querySelector('meta[name="description"]');
+    if (!descriptionTag) {
+      descriptionTag = document.createElement('meta');
+      descriptionTag.name = 'description';
+      document.head.appendChild(descriptionTag);
     }
-    description.content = metadata.description;
+    descriptionTag.content = description;
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.content = metadata.title;
+    if (ogTitle) ogTitle.content = title;
     const ogDescription = document.querySelector('meta[property="og:description"]');
-    if (ogDescription) ogDescription.content = metadata.description;
+    if (ogDescription) ogDescription.content = description;
     const ogUrl = document.querySelector('meta[property="og:url"]');
     if (ogUrl) ogUrl.content = `https://indiaspeaks.netlify.app${pathname}`;
 
@@ -126,8 +149,12 @@ function RouteMetadata() {
       document.head.appendChild(robots);
     }
     robots.content =
-      pathname === '/search' || pathname === '/newsDetails' ? 'noindex,follow' : 'index,follow';
-  }, [pathname]);
+      pathname === '/search' || pathname === '/newsDetails' || pathname === '/story' || pathname === '/saved'
+        ? 'noindex,follow'
+        : metadata
+          ? 'index,follow'
+          : 'noindex,follow';
+  }, [pathname, searchParams]);
 
   return null;
 }
@@ -137,6 +164,9 @@ function AppLayout() {
 
   return (
     <div>
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <LoadingBar
         color="#f11946"
         progress={progress}
@@ -149,7 +179,9 @@ function AppLayout() {
       <RouteMetadata />
       <Suspense fallback={<div>Loading...</div>}>
         <NavBar />
-        <Outlet context={setProgress} />
+        <div id="main-content" tabIndex="-1">
+          <Outlet context={setProgress} />
+        </div>
       </Suspense>
       <footer className="site-footer">
         <div className="site-footer__inner">
@@ -176,9 +208,40 @@ function NewsRoute({category}) {
   return <News key={category} category={category} setProgress={setProgress} />;
 }
 
+function NotFound() {
+  return (
+    <main className="story-detail">
+      <p className="news-page__eyebrow">404 · PAGE NOT FOUND</p>
+      <h1>We couldn’t find that page.</h1>
+      <p>The link may be outdated, or the address may be incorrect.</p>
+      <Link className="info-button" to="/">
+        Return to headlines <span aria-hidden="true">→</span>
+      </Link>
+    </main>
+  );
+}
+
+function RouteError() {
+  const error = useRouteError();
+  React.useEffect(() => {
+    console.error('A page failed to load:', error);
+  }, [error]);
+  return (
+    <main className="story-detail" role="alert">
+      <p className="news-page__eyebrow">SOMETHING WENT WRONG</p>
+      <h1>This page could not be loaded.</h1>
+      <p>Please try again or return to the latest headlines.</p>
+      <Link className="info-button" to="/">
+        Return to headlines <span aria-hidden="true">→</span>
+      </Link>
+    </main>
+  );
+}
+
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
+    errorElement: <RouteError />,
     children: [
       {path: '/', element: <NewsRoute category="top" />},
       {path: '/politics', element: <NewsRoute category="politics" />},
@@ -192,11 +255,14 @@ const router = createBrowserRouter([
       {path: '/food', element: <NewsRoute category="food" />},
       {path: '/environment', element: <NewsRoute category="environment" />},
       {path: '/search', element: <NewsRoute category="search" />},
+      {path: '/saved', element: <SavedStories />},
+      {path: '/story', element: <NewsDetail />},
       {path: '/newsDetails', element: <NewsDetail />},
       {path: '/privacy-policy', element: <PrivacyPolicy />},
       {path: '/news-literacy', element: <NewsLiteracy />},
       {path: '/contact-us', element: <ContactUs />},
       {path: '/about-us', element: <AboutUs />},
+      {path: '*', element: <NotFound />},
     ],
   },
 ]);

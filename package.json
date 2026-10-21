@@ -5,6 +5,7 @@
   "dependencies": {
     "@testing-library/jest-dom": "^7.0.1",
     "axios": "^1.20.0",
+    "dotenv": "^18.0.8",
     "eslint-config-react-app": "^7.0.1",
     "prop-types": "^15.8.1",
     "react": "^19.3.1",
@@ -33,6 +34,11 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -47,6 +53,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@testing-library/dom": "^10.4.2"
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3"
   }
 }

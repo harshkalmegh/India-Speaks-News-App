@@ -1,114 +1,98 @@
-import React, {useState, useEffect, Suspense} from 'react';
+import React, {useEffect, useState, Suspense} from 'react';
 import PropTypes from 'prop-types';
+import {useSearchParams} from 'react-router-dom';
 import {GetRequest} from './Utilities/Network/Index';
+import {getSafeHttpUrl} from './Utilities/Stories';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 const NewsItem = React.lazy(() => import('./NewsItem'));
 const Spinner = React.lazy(() => import('./Spinner'));
 
-const API_KEYS = [
-  'pub_69185e9b582562890079695628ea412ef69c',
-  'pub_69196c0a7d5b2498f5716de4a37b63790a42',
-];
-
-const BASE_URL = 'https://newsdata.io/api/1/news';
-const COMMON_PARAMS = 'country=in&language=en,hi';
+const popularSearches = ['indore', 'madhya pradesh', 'amravati', 'maharashtra', 'आरएसएस'];
 const capitalizeFirstLetter = value => value.charAt(0).toUpperCase() + value.slice(1);
 
-/**
- * Tries each API key in order until one returns a valid response.
- * @param {string} queryParams - Query string appended after the common params (e.g. "&category=sports&page=abc")
- * @param {AbortSignal} [signal] - Cancels the pending request when the feed changes.
- * @returns {Promise<object|undefined>} The first successful response, or undefined if all keys fail.
- */
-const tryApiKeys = async (queryParams, signal) => {
-  for (const key of API_KEYS) {
-    if (signal?.aborted) return undefined;
-    const url = `${BASE_URL}?apikey=${key}&${COMMON_PARAMS}${queryParams}`;
-    const result = await GetRequest(url, signal, 9000);
-    if (result !== undefined) return result;
-  }
-  return undefined;
-};
-
 function News({category = 'general', setProgress}) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q')?.trim() || '';
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [feedError, setFeedError] = useState(false);
   const [feedRequest, setFeedRequest] = useState(0);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState('');
   const [totalResults, setTotalResults] = useState(0);
-  const [input, setInput] = useState('');
-  const [search, setSearch] = useState(false);
+  const [input, setInput] = useState(initialQuery);
+  const [submittedQuery, setSubmittedQuery] = useState(initialQuery);
   const [nextPage, setNextPage] = useState('');
   const [headlines, setHeadlines] = useState([]);
   const [headlinesLoading, setHeadlinesLoading] = useState(true);
   const [headlinesError, setHeadlinesError] = useState(false);
   const [headlinesRequest, setHeadlinesRequest] = useState(0);
-  const [keywords, setKeywords] = useState([]);
-  const [trendsKeywords, setTrendsKeywords] = useState([]);
-
-  const newsSearches = [
-    'indore',
-    'madhya pradesh',
-    'amravati',
-    'maharashtra',
-    'आरएसएस'
-  ];
-
-  useEffect(() => {
-    if (input === '') {
-      setArticles([]);
-      setSearch(false);
-    }
-  }, [input]);
+  const [language, setLanguage] = useState('hi');
+  const [articleLanguage, setArticleLanguage] = useState('en,hi');
 
   useEffect(() => {
     const controller = new AbortController();
-
     const updateNews = async () => {
-      const pageParam = nextPage ? `&page=${nextPage}` : '';
-
-      if (category === 'search' && input === '') {
+      if (category === 'search' && !submittedQuery) {
         setLoading(false);
+        setFeedError(false);
         setArticles([]);
+        setTotalResults(0);
+        setNextPage('');
         return;
       }
 
-      const queryParams =
-        category === 'search'
-          ? `&q=${encodeURIComponent(input)}${pageParam}`
-          : `&category=${category}${pageParam}`;
+      const parameters = new URLSearchParams();
+      parameters.set('language', articleLanguage);
+      if (category === 'search') parameters.set('q', submittedQuery);
+      else parameters.set('category', category);
+      if (page) parameters.set('page', page);
 
       setLoading(true);
       setFeedError(false);
       try {
-        const data = await tryApiKeys(queryParams, controller.signal);
+        const data = await GetRequest(
+          `/.netlify/functions/news?${parameters.toString()}`,
+          controller.signal,
+        );
 
-        if (data !== undefined && Array.isArray(data.results) && !controller.signal.aborted) {
-          setArticles(currentArticles => [...currentArticles, ...data.results]);
-          setTotalResults(data.totalResults || 0);
-          setNextPage(data.nextPage || '');
+        if (controller.signal.aborted) return;
+        if (!data || data.status !== 'ok' || !Array.isArray(data.results)) {
+          throw new Error('The news service returned an invalid response.');
+        }
 
-          if (category !== 'search') {
-            setProgress(100);
-          }
-        } else if (!controller.signal.aborted) {
+        setArticles(currentArticles => {
+          const existingIds = new Set(
+            currentArticles.map(article => article.article_id || article.link).filter(Boolean),
+          );
+          const newArticles = data.results.filter(article => {
+            const id = article.article_id || article.link;
+            if (!id || existingIds.has(id)) return false;
+            existingIds.add(id);
+            return true;
+          });
+          return page ? [...currentArticles, ...newArticles] : newArticles;
+        });
+        setTotalResults(Number(data.totalResults) || 0);
+        setNextPage(typeof data.nextPage === 'string' ? data.nextPage : '');
+        if (category !== 'search') setProgress?.(100);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error('Failed to load news stories:', error);
           setFeedError(true);
         }
       } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
     updateNews();
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, category, search, feedRequest]);
+  }, [page, category, submittedQuery, feedRequest, setProgress, articleLanguage]);
 
-  const fetchMoreData = () => setPage(currentPage => currentPage + 1);
+  const fetchMoreData = () => {
+    if (!loading && nextPage && articles.length < totalResults) setPage(nextPage);
+  };
 
   const startSearch = query => {
     const searchQuery = (query ?? input).trim();
@@ -116,123 +100,68 @@ function News({category = 'general', setProgress}) {
 
     setInput(searchQuery);
     setArticles([]);
-    setPage(0);
-    setTotalResults(0);
+    setPage('');
     setNextPage('');
-    setSearch(currentSearch => !currentSearch);
+    setTotalResults(0);
+    setSubmittedQuery(searchQuery);
+    setSearchParams({q: searchQuery});
+    setFeedRequest(request => request + 1);
+  };
+
+  const clearSearch = () => {
+    setArticles([]);
+    setPage('');
+    setNextPage('');
+    setTotalResults(0);
+    setInput('');
+    setSubmittedQuery('');
+    setSearchParams({});
+    setFeedRequest(request => request + 1);
   };
 
   useEffect(() => {
-    if (category !== 'top' && category !== 'search') return;
+    if (category !== 'top' && category !== 'search') return undefined;
 
     const controller = new AbortController();
-
-    const fetchTrendingNews = async () => {
+    const fetchHeadlines = async () => {
       setHeadlinesLoading(true);
       setHeadlinesError(false);
       try {
-        const response = await fetch('/.netlify/functions/google-news?language=hi', {
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          `/.netlify/functions/google-news?language=${encodeURIComponent(language)}`,
+          {signal: controller.signal},
+        );
         const data = await response.json();
         if (!response.ok || data.status !== 'ok' || !Array.isArray(data.items)) {
-          throw new Error(data.message || `Google News request failed with status ${response.status}.`);
+          throw new Error(data.message || `Headlines request failed with status ${response.status}.`);
         }
-        if (data.items.length === 0) {
-          throw new Error('Google News returned no headlines.');
-        }
-        setHeadlines(
-          data.items.slice(0, 10).map(item => ({
-            title: item.title,
-            url: item.link,
-            publishedAt: item.pubDate,
-          })),
-        );
+        if (controller.signal.aborted) return;
+
+        const items = data.items.slice(0, 10).map((item, index) => ({
+          id: item.guid || item.link || `headline-${index}`,
+          title: item.title || '',
+          url: getSafeHttpUrl(item.link),
+          publishedAt: item.pubDate || '',
+        }));
+        setHeadlines(items.filter(item => item.title && item.url));
       } catch (error) {
         if (!controller.signal.aborted) {
-          console.error('Failed to load trending headlines:', error);
+          console.error('Failed to load Google News headlines:', error);
           setHeadlinesError(true);
         }
       } finally {
-        if (!controller.signal.aborted) {
-          setHeadlinesLoading(false);
-        }
+        if (!controller.signal.aborted) setHeadlinesLoading(false);
       }
     };
 
-    fetchTrendingNews();
-
+    fetchHeadlines();
     return () => controller.abort();
-  }, [category, headlinesRequest]);
+  }, [category, language, headlinesRequest]);
 
-  useEffect(() => {
-    if (category !== 'search') return;
-
-    const twitterTrendsApiUrl = 'https://twitter-trends5.p.rapidapi.com/twitter/request.php';
-    const controller = new AbortController();
-
-    const body = new URLSearchParams({
-      woeid: '23424848',
-    });
-
-    const fetchKeywords = async () => {
-      try {
-        const response = await fetch('/.netlify/functions/google-news?language=en', {
-          signal: controller.signal,
-        });
-        const data = await response.json();
-        if (!response.ok || data.status !== 'ok' || !Array.isArray(data.items)) {
-          throw new Error(data.message || `Google News request failed with status ${response.status}.`);
-        }
-
-        setKeywords(
-          data.items.slice(0, 10).map((item, index) => ({
-            id: item.guid || item.link || `keyword-${index}`,
-            name: (item.title || '').replace(/:\s*[\d,KkMm]+\+?\s*searches$/, '').trim(),
-            link: item.link,
-          })),
-        );
-      } catch (err) {
-        if (!controller.signal.aborted) {
-          console.error('Failed to load Google News trends:', err);
-        }
-      }
-    };
-
-    const fetchTrends = async () => {
-      try {
-        const response = await fetch(twitterTrendsApiUrl, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            'x-rapidapi-key': 'ee8fc918e4mshaafbe7657594c9fp124bc3jsndf1496a8b3c7',
-            'x-rapidapi-host': 'twitter-trends5.p.rapidapi.com',
-          },
-          body: body.toString(),
-        });
-        const data = await response.json();
-        if (!response.ok || !Array.isArray(data.trends)) {
-          throw new Error(data.message || `Trends service request failed with status ${response.status}.`);
-        }
-
-        setTrendsKeywords(
-          data.trends.slice(0, 12).map((item, index) => ({
-            id: item.guid || item.link || `trend-${index}`,
-            name: item.name,
-          })),
-        );
-      } catch (err) {
-        console.error('Failed to load trending searches:', err);
-      }
-    };
-
-    fetchTrends();
-    fetchKeywords();
-    return () => controller.abort();
-  }, [category]);
+  const hasMore = Boolean(nextPage) && articles.length < totalResults;
 
   return (
-    <Suspense fallback={<div className="news-page__loading">Loading news…</div>}>
+    <Suspense fallback={<div className="news-page__loading" role="status">Loading news…</div>}>
       <main className="news-page">
         <header className="news-page__heading">
           <p className="news-page__eyebrow">THE LATEST FROM INDIA</p>
@@ -242,147 +171,152 @@ function News({category = 'general', setProgress}) {
               ? 'Find the stories and topics you care about.'
               : 'The stories shaping India, selected for you.'}
           </p>
-        </header>
-        <div className="news-page__content">
-          {category === 'search' && (
-            <>
-              <form
-                className="news-search"
-                onSubmit={event => {
-                  event.preventDefault();
-                  startSearch();
+          {category !== 'search' && (
+            <p className="news-page__cache-note" role="note">
+              Feeds may use temporarily cached stories when you’re offline; check publication dates for freshness.
+            </p>
+          )}
+          <div className="news-language-controls">
+            <label className="news-language">
+              Stories language
+              <select
+                value={articleLanguage}
+                onChange={event => {
+                  setArticles([]);
+                  setPage('');
+                  setNextPage('');
+                  setTotalResults(0);
+                  setArticleLanguage(event.target.value);
                 }}
               >
-                <input
-                  type="text"
-                  className="SearchNews"
-                  placeholder="Search news and topics"
-                  aria-label="Search news"
-                  value={input}
-                  onChange={event => setInput(event.target.value)}
-                  enterKeyHint="search"
-                />
-                <div className="SearchNewsIcon">
-                  <button className="SearchNewsButton news-search__submit" type="submit">
-                    Search
-                  </button>
-                  <button
-                    className="SearchNewsButton news-search__reset"
-                    type="button"
-                    onClick={() => {
-                      setArticles([]);
-                      setPage(0);
-                      setTotalResults(0);
-                      setNextPage('');
-                      setInput('');
-                      setSearch(false);
-                    }}
-                  >
-                    Clear
-                  </button>
-                </div>
-              </form>
-              {articles.length === 0 && (
-                <div className="newsSearches">
-                  <h2 className="news-page__section-title">Explore popular topics</h2>
-                  <div className="news-search__suggestions">
-                  {newsSearches.map(item => (
+                <option value="en,hi">English and Hindi</option>
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+              </select>
+            </label>
+            {(category === 'top' || category === 'search') && (
+              <label className="news-language">
+                Headlines language
+                <select value={language} onChange={event => setLanguage(event.target.value)}>
+                  <option value="hi">Hindi</option>
+                  <option value="en">English</option>
+                </select>
+              </label>
+            )}
+          </div>
+        </header>
+
+        {category === 'search' && (
+          <div className="news-page__content">
+            <form
+              className="news-search"
+              onSubmit={event => {
+                event.preventDefault();
+                startSearch();
+              }}
+            >
+              <input
+                type="search"
+                className="SearchNews"
+                placeholder="Search news and topics"
+                aria-label="Search news"
+                value={input}
+                maxLength={250}
+                onChange={event => setInput(event.target.value)}
+                enterKeyHint="search"
+              />
+              <div className="SearchNewsIcon">
+                <button className="SearchNewsButton news-search__submit" type="submit">
+                  Search
+                </button>
+                <button className="SearchNewsButton news-search__reset" type="button" onClick={clearSearch}>
+                  Clear
+                </button>
+              </div>
+            </form>
+            {!submittedQuery && (
+              <section className="newsSearches" aria-labelledby="popular-topics">
+                <h2 id="popular-topics" className="news-page__section-title">
+                  Explore popular topics
+                </h2>
+                <div className="news-search__suggestions">
+                  {popularSearches.map(item => (
                     <button
                       key={item}
                       className="news-search__chip"
+                      type="button"
                       onClick={() => startSearch(item)}
                     >
                       {item}
                     </button>
                   ))}
-                  {trendsKeywords.map(item => (
+                  {headlines.map(item => (
                     <button
                       key={item.id}
                       className="news-search__chip"
-                      onClick={() => {
-                        if (!item.name.includes('#')) {
-                          startSearch(item.name);
-                        } else {
-                          alert(
-                            'Sorry, this trend cannot be searched due to special characters in its name. Please try another trend.',
-                          );
-                        }
-                      }}
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                  {keywords.map(item => (
-                    <a
-                      key={item.id}
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="news-search__chip"
-                    >
-                      {item.name}
-                    </a>
-                  ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-        {(category === 'top' || (category === 'search' && articles.length === 0)) && (
-            <section className="containerTopHead" aria-labelledby="trending-headlines">
-              <div className="news-cardTopHead">
-                <div className="news-cardTopHead__heading">
-                  <span className="news-cardTopHead__icon" aria-hidden="true">
-                    ↗
-                  </span>
-                  <div>
-                    <p className="news-page__eyebrow">GOOGLE NEWS INDIA · HINDI</p>
-                    <h2 id="trending-headlines" className="titleTopHead">
-                      Top 10 headlines
-                    </h2>
-                  </div>
-                </div>
-                {headlinesLoading ? (
-                  <p className="loadingTopHead" role="status">
-                    Finding the latest stories…
-                  </p>
-                ) : headlinesError ? (
-                  <div role="alert">
-                    <p className="loadingTopHead">
-                      Google News headlines could not be loaded right now.
-                    </p>
-                    <button
-                      className="SearchNewsButton"
                       type="button"
-                      onClick={() => setHeadlinesRequest(request => request + 1)}
+                      onClick={() => startSearch(item.title)}
                     >
-                      Try again
+                      {item.title}
                     </button>
-                  </div>
-                ) : (
-                  <ul className="news-listTopHead">
-                    {headlines.map((article, index) => (
-                      <li key={article.url || article.title} className="news-itemTopHead">
-                        <a
-                          href={article.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          lang="hi"
-                        >
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        )}
+
+        {(category === 'top' || (category === 'search' && !submittedQuery)) && (
+          <section className="containerTopHead" aria-labelledby="trending-headlines">
+            <div className="news-cardTopHead">
+              <div className="news-cardTopHead__heading">
+                <span className="news-cardTopHead__icon" aria-hidden="true">↗</span>
+                <div>
+                  <p className="news-page__eyebrow">GOOGLE NEWS INDIA · {language.toUpperCase()}</p>
+                  <h2 id="trending-headlines" className="titleTopHead">Top 10 headlines</h2>
+                </div>
+              </div>
+              {headlinesLoading ? (
+                <p className="loadingTopHead" role="status">Finding the latest stories…</p>
+              ) : headlinesError ? (
+                <div role="alert">
+                  <p className="loadingTopHead">Google News headlines could not be loaded right now.</p>
+                  <button
+                    className="SearchNewsButton"
+                    type="button"
+                    onClick={() => setHeadlinesRequest(request => request + 1)}
+                  >
+                    Try again
+                  </button>
+                </div>
+              ) : headlines.length ? (
+                <ul className="news-listTopHead">
+                  {headlines.map((article, index) => {
+                    const publishedAt = new Date(article.publishedAt);
+                    return (
+                      <li key={article.id} className="news-itemTopHead">
+                        <a href={article.url} target="_blank" rel="noopener noreferrer" lang={language}>
                           {index + 1}. {article.title}
                         </a>
-                        <p className="timestampTopHead">
-                          {new Date(article.publishedAt).toLocaleString('en-IN')}
-                        </p>
+                        {!Number.isNaN(publishedAt.getTime()) && (
+                          <p className="timestampTopHead">
+                            <time dateTime={publishedAt.toISOString()}>
+                              {publishedAt.toLocaleString('en-IN')}
+                            </time>
+                          </p>
+                        )}
                       </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </section>
-          )}
-        {(articles.length > 0 || loading) && (
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="loadingTopHead" role="status">No headlines are available right now.</p>
+              )}
+            </div>
+          </section>
+        )}
+
+        {(articles.length > 0 || loading || (category === 'search' && submittedQuery)) && (
           <div className="news-feed__heading">
             <h2>{category === 'search' ? 'Search results' : 'Latest stories'}</h2>
             {articles.length > 0 && (
@@ -390,16 +324,22 @@ function News({category = 'general', setProgress}) {
             )}
           </div>
         )}
+
+        {category === 'search' && submittedQuery && !loading && !feedError && articles.length === 0 && (
+          <div className="news-search__empty" role="status">
+            <h2>No stories found</h2>
+            <p>Try a different search phrase or check the spelling.</p>
+          </div>
+        )}
+
         <InfiniteScroll
           dataLength={articles.length}
           next={fetchMoreData}
-          hasMore={Boolean(nextPage) && articles.length < totalResults}
+          hasMore={hasMore}
           loader={loading ? <Spinner /> : null}
           endMessage={
-            articles.length > 0 && (
-              <p className="text-center my-4" role="status">
-                You’re all caught up.
-              </p>
+            articles.length > 0 && !loading && (
+              <p className="text-center my-4" role="status">You’re all caught up.</p>
             )
           }
         >
@@ -417,26 +357,38 @@ function News({category = 'general', setProgress}) {
           )}
           <div className="news-feed">
             <div className="news-feed__grid">
-              {articles.map((element, index) => (
+              {articles.map((article, index) => (
                 <div
                   className="news-feed__item"
-                  key={element.article_id || element.link || `${element.title}-${index}`}
+                  key={article.article_id || article.link || `${article.title}-${index}`}
                 >
                   <NewsItem
-                    title={element.title || ''}
-                    description={element.description || ''}
-                    imageUrl={element.image_url}
-                    newsUrl={element.link}
-                    author={element.creator}
-                    date={element.pubDate}
-                    source={element.source_id}
-                    content={element.content}
+                    title={article.title || ''}
+                    description={article.description || ''}
+                    imageUrl={article.image_url}
+                    newsUrl={article.link}
+                    author={Array.isArray(article.creator) ? article.creator.join(', ') : article.creator}
+                    date={article.pubDate}
+                    source={article.source_id}
                   />
                 </div>
               ))}
             </div>
           </div>
         </InfiniteScroll>
+
+        {hasMore && (
+          <div className="news-feed__load-more">
+            <button
+              className="SearchNewsButton news-search__submit"
+              type="button"
+              onClick={fetchMoreData}
+              disabled={loading}
+            >
+              {loading ? 'Loading…' : 'Load more stories'}
+            </button>
+          </div>
+        )}
       </main>
     </Suspense>
   );

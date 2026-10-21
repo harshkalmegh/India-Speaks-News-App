@@ -19,7 +19,7 @@ function PrivacyPolicy() {
         <p className="info-hero__intro">
           A plain-language overview of what happens when you use India Speaks.
         </p>
-        <p className="privacy-updated">Last updated: 20 October 2026</p>
+        <p className="privacy-updated">Last updated: 21 October 2026</p>
       </header>
 
       <div className="privacy-layout">
@@ -44,10 +44,10 @@ function PrivacyPolicy() {
           <section id="information">
             <h2>Information and how it is used</h2>
             <p>
-              When you browse news or search, your browser requests content from the services that provide
-              the app’s news, headlines, and trends. Those requests may include standard technical
-              information such as your IP address, browser, and the requested content. Search terms are sent
-              to the news service to retrieve matching stories.
+              When you browse news or search, your browser requests content from India Speaks’ Netlify
+              Functions. Those functions request stories from NewsData.io or Google News RSS. Netlify and
+              those providers may receive standard technical information such as your IP address, browser,
+              and requested content. Search terms are sent to the news service to retrieve matching stories.
             </p>
             <p>
               If you use the contact form, it prepares an email using your device’s email application. The
@@ -55,6 +55,9 @@ function PrivacyPolicy() {
               will be handled by your email provider and the recipient once you send it.
             </p>
             <p>
+              Saved stories and preferred topic shortcuts are kept in local storage in the browser on the
+              device where you set them. Search phrases are included in the search page URL so a search can
+              be reopened or shared.
               We have not found app-managed account profiles, payment collection, or analytics/pixel
               integrations in the current website code. Your browser, hosting provider, or third-party
               services may still process technical data as part of delivering the website.
@@ -64,10 +67,11 @@ function PrivacyPolicy() {
           <section id="services">
             <h2>Third-party services</h2>
             <p>
-              The website uses NewsData.io for news, RSS2JSON to convert the Google News feed, and a
-              RapidAPI-hosted trends service for popular topics. When your browser requests those features,
-              the relevant provider may receive technical request data and, for search, the search query.
-              Their own privacy policies and terms govern their handling of that information.
+              The website uses NewsData.io for category feeds and search results, and requests Google News
+              RSS headlines through a Netlify Function. The site no longer uses the previously integrated
+              RapidAPI trends service. When a provider receives a request, it may process technical request
+              data and, for NewsData.io search, the search query. Provider privacy policies and terms govern
+              their handling of that information.
             </p>
             <p>
               News articles link to their publishers. Opening an external link takes you to a site with its
@@ -101,8 +105,9 @@ function PrivacyPolicy() {
             <h2>Your choices</h2>
             <p>
               You can choose what to search for and whether to open external stories. You do not need to
-              submit personal details to browse the news. If you contact us, include only the information
-              needed to respond.
+              submit personal details to browse the news. You can remove saved stories using the Saved
+              Stories page, update your topic shortcuts, or clear this site's local storage in your browser.
+              If you contact us, include only the information needed to respond.
             </p>
           </section>
 
