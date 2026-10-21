@@ -128,15 +128,12 @@ function News({category = 'general', setProgress}) {
     const controller = new AbortController();
 
     const fetchTrendingNews = async () => {
-      const googleNewsRssUrl = 'https://news.google.com/rss?hl=hi&gl=IN&ceid=IN:hi';
-      const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
-        googleNewsRssUrl,
-      )}`;
-
       setHeadlinesLoading(true);
       setHeadlinesError(false);
       try {
-        const response = await fetch(url, {signal: controller.signal});
+        const response = await fetch('/.netlify/functions/google-news?language=hi', {
+          signal: controller.signal,
+        });
         const data = await response.json();
         if (!response.ok || data.status !== 'ok' || !Array.isArray(data.items)) {
           throw new Error(data.message || `Google News request failed with status ${response.status}.`);
@@ -171,12 +168,8 @@ function News({category = 'general', setProgress}) {
   useEffect(() => {
     if (category !== 'search') return;
 
-    const googleTrendsRssUrl = 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en';
-    const rssToJsonApiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(
-      googleTrendsRssUrl,
-    )}`;
-
     const twitterTrendsApiUrl = 'https://twitter-trends5.p.rapidapi.com/twitter/request.php';
+    const controller = new AbortController();
 
     const body = new URLSearchParams({
       woeid: '23424848',
@@ -184,14 +177,12 @@ function News({category = 'general', setProgress}) {
 
     const fetchKeywords = async () => {
       try {
-        const response = await fetch(rssToJsonApiUrl);
+        const response = await fetch('/.netlify/functions/google-news?language=en', {
+          signal: controller.signal,
+        });
         const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message || `RSS service connection error. HTTP status: ${response.status}.`);
-        }
-
-        if (data.status !== 'ok' || !Array.isArray(data.items)) {
-          throw new Error(data.message || 'RSS conversion service could not process the feed.');
+        if (!response.ok || data.status !== 'ok' || !Array.isArray(data.items)) {
+          throw new Error(data.message || `Google News request failed with status ${response.status}.`);
         }
 
         setKeywords(
@@ -202,7 +193,9 @@ function News({category = 'general', setProgress}) {
           })),
         );
       } catch (err) {
-        console.error('Failed to load Google News trends:', err);
+        if (!controller.signal.aborted) {
+          console.error('Failed to load Google News trends:', err);
+        }
       }
     };
 
@@ -235,6 +228,7 @@ function News({category = 'general', setProgress}) {
 
     fetchTrends();
     fetchKeywords();
+    return () => controller.abort();
   }, [category]);
 
   return (

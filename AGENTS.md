@@ -15,6 +15,13 @@ Follow these principles for every codebase task:
 
 The existing codebase is the primary source of truth for architecture, conventions, and implementation patterns.
 
+### Workspace Structure & Execution Boundaries
+
+* The project root has no `package.json`. **Never run `npm` commands directly in the root directory.**
+* **Backend (`backend/`):** Node.js (ESM), Express, Sequelize (MySQL), Redis session cache, Joi, Winston, Jest.
+* **Frontend (`frontend/`):** React 19, Vite, Bootstrap 5, Sass, React Router v7, React Hook Form.
+* Always explicitly set the working directory to `backend/` or `frontend/` when running builds, scripts, tests, or dependency checks.
+
 ---
 
 ## 2. Graphify — Primary Code Navigation
@@ -142,6 +149,25 @@ Do not introduce a new pattern when an established project pattern already solve
 Existing code is a reference, **not something to copy blindly**.
 
 If an existing implementation contains an obvious bug, unsafe behavior, unnecessary duplication, or clearly outdated approach, do not reproduce the problem. Prefer the safest solution consistent with the project.
+
+### Key Architectural Anchors (vilcms)
+
+* **Backend Patterns (`backend/src/`):**
+  * **ESM Modules:** Uses ES module syntax (`"type": "module"`). Always use `import`/`export`.
+  * **Layered Architecture:** Controllers (`src/controllers/`) → Services (`src/services/`) → Models (`src/models/`).
+  * **Admin CRUD Generator:** Always inspect `src/utils/createAdminCrudModule.js` and `src/utils/adminModuleCustomization.js` before writing custom CRUD controllers.
+  * **Validation:** Joi validation schemas reside in `src/validators/` and are enforced at the route boundary.
+  * **Database:** Sequelize ORM with MySQL. DB setup and models reside in `src/config/database.js` and `src/models/`.
+  * **Caching & Sessions:** Redis (`ioredis`) for session store and caching (`src/config/redis.js`, `src/config/session.js`).
+  * **Logging:** Use the Winston logger in `src/utils/logger.js` (never bare `console.log`).
+  * **Storage:** AWS S3 integration via `src/services/storage/s3.service.js`.
+
+* **Frontend Patterns (`frontend/src/`):**
+  * **Framework & Build:** React 19 SPA built with Vite (`frontend/vite.config.js`).
+  * **Routing:** React Router v7 configured in `src/App.jsx` / `src/routes/`.
+  * **Forms:** `react-hook-form` for form state and validation handling.
+  * **Styling:** Bootstrap 5 with Sass (`sass`). Custom SCSS lives in `src/assets/styles/`.
+  * **API Client:** Axios instance in `src/services/` with request/response interceptors for auth & error handling.
 
 ---
 
@@ -284,24 +310,38 @@ Handle realistic failure cases without adding excessive defensive code or unnece
 
 ## 13. Testing and Verification
 
-After making code changes:
+After making code changes, validate using the project's exact commands from their corresponding working directories:
 
-1. Run relevant tests.
-2. Run type checking if available.
-3. Run linting if available.
-4. Run the build if appropriate.
-5. Fix errors caused by the implementation.
-6. Re-run validation after fixes.
+### Concrete Verification Commands:
 
-Do not consider a task complete merely because the code compiles locally.
+* **Frontend Verification:**
+  ```bash
+  cd frontend && npm run build
+  ```
+  *(Verifies Vite bundling, React JSX syntax, import resolution, and SCSS compilation).*
 
-Use the project's existing validation commands and conventions.
+* **Backend Verification:**
+  * Run test suite:
+    ```bash
+    cd backend && npm test
+    ```
+  * Syntax / module sanity check:
+    ```bash
+    cd backend && node --check src/server.js
+    ```
+
+* **AST Knowledge Graph Sync:**
+  ```bash
+  graphify update .
+  ```
+
+Do not consider a task complete merely because the code compiles locally. Fix errors or regressions before concluding.
 
 ---
 
-## 14. Review the Final Diff
+## 14. Review the Final Diff & Anti-Overengineering Audit
 
-Before completing the task, inspect the final diff.
+Before completing the task, inspect the final diff (`git diff`).
 
 Verify:
 
@@ -315,7 +355,12 @@ Verify:
 * The implementation follows existing project patterns.
 * Tests/build/lint/type checks were performed where applicable.
 
-If unnecessary changes are found, remove them.
+### Anti-Overengineering & "Delete-List" Checklist:
+
+* **YAGNI:** Does every added line directly serve the requirement?
+* **Native / Platform first:** Could any custom helper be replaced by standard JavaScript/Node.js or existing dependencies?
+* **No premature abstractions:** Are there single-use wrapper functions, speculative config options, or unnecessary interfaces?
+* **Delete-list action:** If any added code can be deleted or simplified without breaking functionality or safety, remove it immediately.
 
 ---
 
